@@ -127,7 +127,7 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-                    <mainClass>cn.xiaofuge.Application</mainClass>
+                    <mainClass>cn.xiaofuge.x.Application</mainClass>
                     <layout>JAR</layout>
                 </configuration>
             </plugin>

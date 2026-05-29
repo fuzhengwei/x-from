@@ -16,7 +16,7 @@ var FormApi = (function () {
             return '/api/form';
         }
         // 其他场景（IDE 内置服务器、file:// 等），直连后端
-        return 'http://localhost:8091/api/form';
+        return 'http://140.143.183.225:8091/api/form';
     })();
 
     /**

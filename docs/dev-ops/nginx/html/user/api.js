@@ -9,7 +9,7 @@ var UserFormApi = (function () {
         if (port === '80' || port === '8080' || port === '') {
             return '/api/form';
         }
-        return 'http://localhost:8091/api/form';
+        return 'http://140.143.183.225:8091/api/form';
     })();
 
     function request(url, options) {
