@@ -1,0 +1,5 @@
+spring:
+  config:
+    name: x-from-app
+  profiles:
+    active: dev
