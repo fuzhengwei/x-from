@@ -1,0 +1,80 @@
+version: '3.8'
+
+services:
+  x-from-app:
+    build:
+      context: ../../
+      dockerfile: Dockerfile
+    container_name: x-from-app
+    restart: on-failure
+    ports:
+      - "8091:8091"
+    environment:
+      - TZ=Asia/Shanghai
+      - SPRING_PROFILES_ACTIVE=dev
+    volumes:
+      - ./logs:/data/log
+    networks:
+      - x-from-network
+    depends_on:
+      - mysql
+      - redis
+
+  x-from-nginx:
+    image: nginx:1.25.1-alpine
+    container_name: x-from-nginx
+    restart: always
+    ports:
+      - "8080:80"
+    volumes:
+      - ./nginx/html:/usr/share/nginx/html
+      - ./nginx/conf:/etc/nginx/conf.d
+    networks:
+      - x-from-network
+    depends_on:
+      - x-from-app
+
+  mysql:
+    image: registry.cn-hangzhou.aliyuncs.com/xfg-studio/mysql:8.0.32
+    container_name: x-from-mysql
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      TZ: Asia/Shanghai
+      MYSQL_ROOT_PASSWORD: 123456
+    ports:
+      - "13306:3306"
+    volumes:
+      - ./mysql/my.cnf:/etc/mysql/conf.d/mysql.cnf:ro
+      - ./mysql/sql:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 10s
+      retries: 10
+      start_period: 15s
+    networks:
+      - x-from-network
+
+  redis:
+    image: registry.cn-hangzhou.aliyuncs.com/xfg-studio/redis:6.2
+    container_name: x-from-redis
+    restart: always
+    hostname: redis
+    privileged: true
+    ports:
+      - "16379:6379"
+    volumes:
+      - ./redis/redis.conf:/usr/local/etc/redis/redis.conf
+    command: redis-server /usr/local/etc/redis/redis.conf
+    networks:
+      - x-from-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+networks:
+  x-from-network:
+    driver: bridge

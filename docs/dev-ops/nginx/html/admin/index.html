@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>表单管理系统</title>
+    <link href="https://cdn.bootcdn.net/ajax/libs/element-plus/2.3.8/index.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #f0f2f5;
+        }
+        .layout {
+            display: flex;
+            min-height: 100vh;
+        }
+        .sidebar {
+            width: 220px;
+            background: #001529;
+            color: white;
+            flex-shrink: 0;
+        }
+        .sidebar-header {
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: bold;
+            background: #002140;
+        }
+        .sidebar-menu {
+            padding: 10px 0;
+        }
+        .menu-item {
+            padding: 12px 24px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .menu-item:hover, .menu-item.active {
+            background: #1890ff;
+        }
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        .header {
+            height: 64px;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            box-shadow: 0 1px 4px rgba(0,21,41,.08);
+        }
+        .header-title {
+            font-size: 18px;
+            font-weight: 500;
+        }
+        .content {
+            flex: 1;
+            padding: 24px;
+            overflow-y: auto;
+        }
+        .card {
+            background: white;
+            border-radius: 4px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+        }
+        .form-item {
+            margin-bottom: 20px;
+        }
+        .form-item label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #606266;
+        }
+        .form-item input, .form-item textarea {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #dcdfe6;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        .form-item input:focus, .form-item textarea:focus {
+            outline: none;
+            border-color: #409eff;
+        }
+        .form-item textarea {
+            min-height: 200px;
+            font-family: monospace;
+        }
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .table th, .table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ebeef5;
+        }
+        .table th {
+            background: #fafafa;
+            font-weight: 600;
+            color: #909399;
+        }
+        .table tr:hover {
+            background: #fafafa;
+        }
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+            margin-right: 8px;
+        }
+        .btn-primary {
+            background: #409eff;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #66b1ff;
+        }
+        .btn-success {
+            background: #67c23a;
+            color: white;
+        }
+        .btn-success:hover {
+            background: #85ce61;
+        }
+        .btn-info {
+            background: #909399;
+            color: white;
+        }
+        .btn-info:hover {
+            background: #a6a9ad;
+        }
+        .status-tag {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        .status-enabled {
+            background: #f0f9eb;
+            color: #67c23a;
+        }
+        .status-disabled {
+            background: #fef0f0;
+            color: #f56c6c;
+        }
+        .hidden {
+            display: none;
+        }
+        .field-editor {
+            border: 1px dashed #dcdfe6;
+            padding: 16px;
+            margin-bottom: 12px;
+            border-radius: 4px;
+        }
+        .field-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        .field-row .form-item {
+            flex: 1;
+            margin-bottom: 0;
+        }
+        .field-actions {
+            text-align: right;
+        }
+        .json-preview {
+            background: #f5f7fa;
+            padding: 12px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+            word-break: break-all;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div id="app" class="layout">
+        <!-- 侧边栏 -->
+        <div class="sidebar">
+            <div class="sidebar-header">📋 表单管理</div>
+            <div class="sidebar-menu">
+                <div class="menu-item active" onclick="showPage('list')">
+                    <span>📝</span> 表单列表
+                </div>
+                <div class="menu-item" onclick="showPage('create')">
+                    <span>➕</span> 创建表单
+                </div>
+            </div>
+        </div>
+
+        <!-- 主内容区 -->
+        <div class="main-content">
+            <div class="header">
+                <div class="header-title" id="pageTitle">表单列表</div>
+                <div>
+                    <span>👤 管理员</span>
+                </div>
+            </div>
+
+            <div class="content">
+                <!-- 表单列表页面 -->
+                <div id="listPage">
+                    <div class="card">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                            <h3>表单列表</h3>
+                            <button class="btn btn-primary" onclick="showPage('create')">
+                                ➕ 创建新表单
+                            </button>
+                        </div>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>表单名称</th>
+                                    <th>表单编码</th>
+                                    <th>状态</th>
+                                    <th>创建人</th>
+                                    <th>创建时间</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="formTableBody">
+                                <!-- 动态填充 -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- 创建表单页面 -->
+                <div id="createPage" class="hidden">
+                    <div class="card">
+                        <h3 style="margin-bottom: 20px;">创建新表单</h3>
+                        <div class="form-item">
+                            <label>表单名称 *</label>
+                            <input type="text" id="formName" placeholder="请输入表单名称">
+                        </div>
+                        <div class="form-item">
+                            <label>表单描述</label>
+                            <input type="text" id="formDesc" placeholder="请输入表单描述">
+                        </div>
+                        <div class="form-item">
+                            <label>表单配置（JSON）*</label>
+                            <textarea id="formConfig" placeholder='{
+  "fields": [
+    {
+      "key": "name",
+      "label": "姓名",
+      "type": "text",
+      "required": true,
+      "placeholder": "请输入您的姓名"
+    },
+    {
+      "key": "email",
+      "label": "邮箱",
+      "type": "email",
+      "required": true,
+      "placeholder": "请输入您的邮箱"
+    }
+  ]
+}'></textarea>
+                        </div>
+                        <div style="text-align: right;">
+                            <button class="btn btn-primary" onclick="createForm()">
+                                ✅ 创建表单
+                            </button>
+                            <button class="btn btn-info" onclick="showPage('list')">
+                                ❌ 取消
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 表单详情页面 -->
+                <div id="detailPage" class="hidden">
+                    <div class="card" id="formDetailCard">
+                        <!-- 动态填充 -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8091/api/form';
+        let currentFormId = null;
+
+        // 页面初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            loadFormList();
+        });
+
+        // 显示页面
+        function showPage(page) {
+            document.getElementById('listPage').classList.add('hidden');
+            document.getElementById('createPage').classList.add('hidden');
+            document.getElementById('detailPage').classList.add('hidden');
+
+            document.querySelectorAll('.menu-item').forEach(item => {
+                item.classList.remove('active');
+            });
+
+            if (page === 'list') {
+                document.getElementById('listPage').classList.remove('hidden');
+                document.querySelectorAll('.menu-item')[0].classList.add('active');
+                document.getElementById('pageTitle').textContent = '表单列表';
+                loadFormList();
+            } else if (page === 'create') {
+                document.getElementById('createPage').classList.remove('hidden');
+                document.querySelectorAll('.menu-item')[1].classList.add('active');
+                document.getElementById('pageTitle').textContent = '创建表单';
+            }
+        }
+
+        // 加载表单列表
+        async function loadFormList() {
+            try {
+                const response = await fetch(`${API_BASE}/list`);
+                const result = await response.json();
+                
+                if (result.code === '0000') {
+                    const tbody = document.getElementById('formTableBody');
+                    tbody.innerHTML = '';
+                    
+                    result.data.forEach(form => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td>${form.id}</td>
+                            <td>${form.formName}</td>
+                            <td><code>${form.formCode}</code></td>
+                            <td>
+                                <span class="status-tag ${form.status.code === 1 ? 'status-enabled' : 'status-disabled'}">
+                                    ${form.status.info}
+                                </span>
+                            </td>
+                            <td>${form.creator}</td>
+                            <td>${form.createTime}</td>
+                            <td>
+                                <button class="btn btn-info" onclick="viewFormDetail('${form.formCode}')">查看</button>
+                                <button class="btn btn-success" onclick="copyFormLink('${form.formCode}')">分享链接</button>
+                            </td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                } else {
+                    alert('加载表单列表失败：' + result.info);
+                }
+            } catch (error) {
+                console.error('加载表单列表失败', error);
+                alert('加载表单列表失败，请检查服务是否启动');
+            }
+        }
+
+        // 创建表单
+        async function createForm() {
+            const formName = document.getElementById('formName').value;
+            const formDesc = document.getElementById('formDesc').value;
+            const formConfig = document.getElementById('formConfig').value;
+
+            if (!formName || !formConfig) {
+                alert('请填写必填字段');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/create`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        formName: formName,
+                        formDesc: formDesc,
+                        formConfig: formConfig,
+                        creator: 'admin'
+                    })
+                });
+
+                const result = await response.json();
+                
+                if (result.code === '0000') {
+                    alert('表单创建成功！表单编码：' + result.data.formCode);
+                    showPage('list');
+                } else {
+                    alert('创建表单失败：' + result.info);
+                }
+            } catch (error) {
+                console.error('创建表单失败', error);
+                alert('创建表单失败，请检查服务是否启动');
+            }
+        }
+
+        // 查看表单详情
+        async function viewFormDetail(formCode) {
+            try {
+                const response = await fetch(`${API_BASE}/get/${formCode}`);
+                const result = await response.json();
+                
+                if (result.code === '0000') {
+                    const form = result.data;
+                    currentFormId = form.id;
+                    
+                    document.getElementById('listPage').classList.add('hidden');
+                    document.getElementById('createPage').classList.add('hidden');
+                    document.getElementById('detailPage').classList.remove('hidden');
+                    document.getElementById('pageTitle').textContent = '表单详情';
+                    
+                    const detailCard = document.getElementById('formDetailCard');
+                    detailCard.innerHTML = `
+                        <h3 style="margin-bottom: 20px;">${form.formName}</h3>
+                        <p style="margin-bottom: 12px;"><strong>表单编码：</strong><code>${form.formCode}</code></p>
+                        <p style="margin-bottom: 12px;"><strong>表单描述：</strong>${form.formDesc || '无'}</p>
+                        <p style="margin-bottom: 12px;"><strong>状态：</strong>
+                            <span class="status-tag ${form.status.code === 1 ? 'status-enabled' : 'status-disabled'}">
+                                ${form.status.info}
+                            </span>
+                        </p>
+                        <p style="margin-bottom: 20px;"><strong>表单配置：</strong></p>
+                        <div class="json-preview">${form.formConfig}</div>
+                        
+                        <div style="margin-top: 20px; display: flex; gap: 12px;">
+                            <button class="btn btn-primary" onclick="copyFormLink('${form.formCode}')">
+                                🔗 复制分享链接
+                            </button>
+                            <button class="btn btn-info" onclick="loadSubmissions(${form.id})">
+                                📊 查看提交数据
+                            </button>
+                            <button class="btn btn-info" onclick="showPage('list')">
+                                ← 返回列表
+                            </button>
+                        </div>
+                        
+                        <div id="submissionsSection" style="margin-top: 24px;" class="hidden">
+                            <h4 style="margin-bottom: 16px;">提交记录</h4>
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>提交人</th>
+                                        <th>IP地址</th>
+                                        <th>提交时间</th>
+                                        <th>数据</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="submissionsTableBody">
+                                    <!-- 动态填充 -->
+                                </tbody>
+                            </table>
+                        </div>
+                    `;
+                } else {
+                    alert('查询表单失败：' + result.info);
+                }
+            } catch (error) {
+                console.error('查询表单失败', error);
+                alert('查询表单失败，请检查服务是否启动');
+            }
+        }
+
+        // 加载提交记录
+        async function loadSubmissions(formId) {
+            try {
+                const response = await fetch(`${API_BASE}/submissions/${formId}`);
+                const result = await response.json();
+                
+                if (result.code === '0000') {
+                    const section = document.getElementById('submissionsSection');
+                    section.classList.remove('hidden');
+                    
+                    const tbody = document.getElementById('submissionsTableBody');
+                    tbody.innerHTML = '';
+                    
+                    result.data.forEach(sub => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td>${sub.id}</td>
+                            <td>${sub.submitter || '匿名'}</td>
+                            <td>${sub.submitterIp || '-'}</td>
+                            <td>${sub.createTime}</td>
+                            <td>
+                                <details>
+                                    <summary>查看数据</summary>
+                                    <pre style="margin-top: 8px; padding: 8px; background: #f5f7fa; border-radius: 4px; font-size: 12px; overflow-x: auto;">${sub.submissionData}</pre>
+                                </details>
+                            </td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                    
+                    if (result.data.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #909399;">暂无提交数据</td></tr>';
+                    }
+                } else {
+                    alert('加载提交记录失败：' + result.info);
+                }
+            } catch (error) {
+                console.error('加载提交记录失败', error);
+                alert('加载提交记录失败，请检查服务是否启动');
+            }
+        }
+
+        // 复制分享链接
+        function copyFormLink(formCode) {
+            const link = `${window.location.origin}/user/form.html?code=${formCode}`;
+            navigator.clipboard.writeText(link).then(() => {
+                alert('链接已复制到剪贴板！\n' + link);
+            }).catch(() => {
+                alert('请手动复制链接：\n' + link);
+            });
+        }
+    </script>
+</body>
+</html>
