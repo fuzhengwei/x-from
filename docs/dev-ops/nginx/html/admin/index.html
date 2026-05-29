@@ -4,534 +4,837 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>表单管理系统</title>
-    <link href="https://cdn.bootcdn.net/ajax/libs/element-plus/2.3.8/index.min.css" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: #f0f2f5;
-        }
-        .layout {
-            display: flex;
-            min-height: 100vh;
-        }
-        .sidebar {
-            width: 220px;
-            background: #001529;
-            color: white;
-            flex-shrink: 0;
-        }
-        .sidebar-header {
-            height: 64px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            font-weight: bold;
-            background: #002140;
-        }
-        .sidebar-menu {
-            padding: 10px 0;
-        }
-        .menu-item {
-            padding: 12px 24px;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .menu-item:hover, .menu-item.active {
-            background: #1890ff;
-        }
-        .main-content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-        }
-        .header {
-            height: 64px;
-            background: white;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 24px;
-            box-shadow: 0 1px 4px rgba(0,21,41,.08);
-        }
-        .header-title {
-            font-size: 18px;
-            font-weight: 500;
-        }
-        .content {
-            flex: 1;
-            padding: 24px;
-            overflow-y: auto;
-        }
-        .card {
-            background: white;
-            border-radius: 4px;
-            padding: 24px;
-            margin-bottom: 24px;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.03);
-        }
-        .form-item {
-            margin-bottom: 20px;
-        }
-        .form-item label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            color: #606266;
-        }
-        .form-item input, .form-item textarea {
-            width: 100%;
-            padding: 8px 12px;
-            border: 1px solid #dcdfe6;
-            border-radius: 4px;
-            font-size: 14px;
-            transition: border-color 0.3s;
-        }
-        .form-item input:focus, .form-item textarea:focus {
-            outline: none;
-            border-color: #409eff;
-        }
-        .form-item textarea {
-            min-height: 200px;
-            font-family: monospace;
-        }
-        .table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        .table th, .table td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid #ebeef5;
-        }
-        .table th {
-            background: #fafafa;
-            font-weight: 600;
-            color: #909399;
-        }
-        .table tr:hover {
-            background: #fafafa;
-        }
-        .btn {
-            padding: 8px 16px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-            transition: all 0.3s;
-            margin-right: 8px;
-        }
-        .btn-primary {
-            background: #409eff;
-            color: white;
-        }
-        .btn-primary:hover {
-            background: #66b1ff;
-        }
-        .btn-success {
-            background: #67c23a;
-            color: white;
-        }
-        .btn-success:hover {
-            background: #85ce61;
-        }
-        .btn-info {
-            background: #909399;
-            color: white;
-        }
-        .btn-info:hover {
-            background: #a6a9ad;
-        }
-        .status-tag {
-            display: inline-block;
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-size: 12px;
-        }
-        .status-enabled {
-            background: #f0f9eb;
-            color: #67c23a;
-        }
-        .status-disabled {
-            background: #fef0f0;
-            color: #f56c6c;
-        }
-        .hidden {
-            display: none;
-        }
-        .field-editor {
-            border: 1px dashed #dcdfe6;
-            padding: 16px;
-            margin-bottom: 12px;
-            border-radius: 4px;
-        }
-        .field-row {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 12px;
-        }
-        .field-row .form-item {
-            flex: 1;
-            margin-bottom: 0;
-        }
-        .field-actions {
-            text-align: right;
-        }
-        .json-preview {
-            background: #f5f7fa;
-            padding: 12px;
-            border-radius: 4px;
-            font-family: monospace;
-            font-size: 12px;
-            white-space: pre-wrap;
-            word-break: break-all;
-            max-height: 300px;
-            overflow-y: auto;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f0f2f5; }
+
+        /* ===== 布局 ===== */
+        .layout { display: flex; min-height: 100vh; }
+        .sidebar { width: 220px; background: #001529; color: #fff; flex-shrink: 0; display: flex; flex-direction: column; }
+        .sidebar-header { height: 64px; display: flex; align-items: center; justify-content: center; font-size: 17px; font-weight: 700; background: #002140; letter-spacing: 1px; }
+        .sidebar-menu { flex: 1; padding: 8px 0; }
+        .menu-item { padding: 14px 24px; cursor: pointer; transition: .3s; display: flex; align-items: center; gap: 10px; font-size: 14px; }
+        .menu-item:hover, .menu-item.active { background: #1890ff; }
+        .sidebar-footer { padding: 16px 24px; border-top: 1px solid rgba(255,255,255,.1); font-size: 13px; }
+        .sidebar-footer .user-info { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+        .sidebar-footer .avatar { width: 32px; height: 32px; border-radius: 50%; background: #1890ff; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+        .logout-btn { color: rgba(255,255,255,.65); cursor: pointer; font-size: 12px; transition: .3s; }
+        .logout-btn:hover { color: #fff; }
+
+        .main { flex: 1; display: flex; flex-direction: column; }
+        .header { height: 64px; background: #fff; display: flex; align-items: center; justify-content: space-between; padding: 0 24px; box-shadow: 0 1px 4px rgba(0,21,41,.08); }
+        .header-title { font-size: 17px; font-weight: 600; color: #303133; }
+        .content { flex: 1; padding: 24px; overflow-y: auto; }
+
+        /* ===== 卡片 ===== */
+        .card { background: #fff; border-radius: 8px; padding: 24px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,.04); }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .card-title { font-size: 16px; font-weight: 600; color: #303133; }
+
+        /* ===== 统计卡片 ===== */
+        .stat-row { display: flex; gap: 16px; margin-bottom: 20px; }
+        .stat-card { flex: 1; background: #fff; border-radius: 8px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,.04); text-align: center; }
+        .stat-num { font-size: 32px; font-weight: 700; color: #303133; }
+        .stat-label { font-size: 13px; color: #909399; margin-top: 4px; }
+        .stat-card.blue .stat-num { color: #409eff; }
+        .stat-card.green .stat-num { color: #67c23a; }
+        .stat-card.orange .stat-num { color: #e6a23c; }
+
+        /* ===== 表格 ===== */
+        .table { width: 100%; border-collapse: collapse; }
+        .table th, .table td { padding: 12px 10px; text-align: left; border-bottom: 1px solid #ebeef5; font-size: 14px; }
+        .table th { background: #fafafa; font-weight: 600; color: #909399; white-space: nowrap; }
+        .table tr:hover { background: #f5f7fa; }
+
+        /* ===== 按钮 ===== */
+        .btn { padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; font-size: 13px; transition: .3s; margin-right: 6px; display: inline-flex; align-items: center; gap: 4px; }
+        .btn-primary { background: #409eff; color: #fff; }
+        .btn-primary:hover { background: #66b1ff; }
+        .btn-success { background: #67c23a; color: #fff; }
+        .btn-success:hover { background: #85ce61; }
+        .btn-warning { background: #e6a23c; color: #fff; }
+        .btn-warning:hover { background: #ebb563; }
+        .btn-danger { background: #f56c6c; color: #fff; }
+        .btn-danger:hover { background: #f78989; }
+        .btn-info { background: #909399; color: #fff; }
+        .btn-info:hover { background: #a6a9ad; }
+        .btn-text { background: transparent; color: #409eff; padding: 4px 8px; }
+        .btn-text:hover { background: #ecf5ff; }
+
+        /* ===== 表单 ===== */
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 500; color: #606266; font-size: 14px; }
+        .form-group label .req { color: #f56c6c; }
+        .form-input { width: 100%; padding: 10px 12px; border: 1px solid #dcdfe6; border-radius: 4px; font-size: 14px; transition: .3s; }
+        .form-input:focus { outline: none; border-color: #409eff; box-shadow: 0 0 0 2px rgba(64,158,255,.15); }
+        textarea.form-input { min-height: 180px; font-family: 'Menlo', 'Monaco', monospace; font-size: 13px; line-height: 1.6; }
+
+        /* ===== 标签 ===== */
+        .tag { display: inline-block; padding: 2px 10px; border-radius: 4px; font-size: 12px; }
+        .tag-success { background: #f0f9eb; color: #67c23a; }
+        .tag-danger { background: #fef0f0; color: #f56c6c; }
+
+        /* ===== 空状态 ===== */
+        .empty { text-align: center; padding: 48px 20px; color: #c0c4cc; }
+        .empty-icon { font-size: 48px; margin-bottom: 12px; }
+        .empty-text { font-size: 14px; }
+
+        /* ===== JSON 预览 ===== */
+        .json-box { background: #f5f7fa; padding: 12px 16px; border-radius: 6px; font-family: monospace; font-size: 12px; white-space: pre-wrap; word-break: break-all; max-height: 260px; overflow-y: auto; line-height: 1.6; border: 1px solid #e8eaec; }
+
+        /* ===== 登录页 ===== */
+        .login-page { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #1d2b64, #2b5cea); }
+        .login-card { background: #fff; border-radius: 12px; padding: 40px; width: 400px; box-shadow: 0 20px 60px rgba(0,0,0,.2); }
+        .login-card h2 { text-align: center; margin-bottom: 8px; font-size: 22px; color: #303133; }
+        .login-card .sub { text-align: center; color: #909399; margin-bottom: 28px; font-size: 13px; }
+        .login-card .form-group { margin-bottom: 18px; }
+        .login-btn { width: 100%; padding: 12px; border: none; border-radius: 6px; background: #409eff; color: #fff; font-size: 15px; font-weight: 600; cursor: pointer; transition: .3s; }
+        .login-btn:hover { background: #66b1ff; }
+        .login-btn:disabled { opacity: .6; cursor: not-allowed; }
+        .login-error { color: #f56c6c; font-size: 13px; margin-bottom: 12px; text-align: center; }
+        .login-tip { text-align: center; color: #c0c4cc; font-size: 12px; margin-top: 16px; }
+
+        /* ===== 提示框 ===== */
+        .toast { position: fixed; top: 24px; right: 24px; padding: 12px 20px; border-radius: 6px; color: #fff; font-size: 14px; z-index: 9999; animation: toastIn .3s ease; }
+        .toast-success { background: #67c23a; }
+        .toast-error { background: #f56c6c; }
+        .toast-info { background: #909399; }
+        @keyframes toastIn { from { transform: translateX(100px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+        .hidden { display: none !important; }
+
+        /* ===== 字段设计器 ===== */
+        .field-card { border: 1px solid #e8eaec; border-radius: 8px; margin-bottom: 12px; transition: .2s; }
+        .field-card:hover { border-color: #c0c4cc; }
+        .field-card-head { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #fafafa; border-radius: 8px 8px 0 0; cursor: pointer; user-select: none; }
+        .field-card-head .field-label { font-weight: 600; color: #303133; font-size: 14px; display: flex; align-items: center; gap: 8px; }
+        .field-card-head .field-type-tag { background: #ecf5ff; color: #409eff; padding: 1px 8px; border-radius: 4px; font-size: 12px; font-weight: 400; }
+        .field-card-head .field-actions { display: flex; gap: 4px; }
+        .field-card-head .field-actions button { background: none; border: none; cursor: pointer; font-size: 16px; padding: 2px 6px; border-radius: 4px; color: #909399; transition: .2s; }
+        .field-card-head .field-actions button:hover { background: #f5f7fa; color: #303133; }
+        .field-card-head .field-actions button.del-btn:hover { color: #f56c6c; }
+        .field-card-body { padding: 16px; display: flex; flex-wrap: wrap; gap: 12px; }
+        .field-card-body .fg { display: flex; flex-direction: column; gap: 6px; }
+        .field-card-body .fg.w1 { width: calc(25% - 9px); }
+        .field-card-body .fg.w2 { width: calc(50% - 6px); }
+        .field-card-body .fg.w3 { width: 100%; }
+        .field-card-body .fg label { font-size: 12px; color: #909399; font-weight: 500; }
+        .field-card-body .fg input, .field-card-body .fg select { padding: 7px 10px; border: 1px solid #dcdfe6; border-radius: 4px; font-size: 13px; }
+        .field-card-body .fg input:focus, .field-card-body .fg select:focus { outline: none; border-color: #409eff; }
+        .field-card-body .toggle { display: flex; align-items: center; gap: 6px; font-size: 13px; color: #606266; padding-top: 20px; }
+        .field-card-body .toggle input[type=checkbox] { width: 16px; height: 16px; cursor: pointer; }
+
+        /* ===== 提交数据详情弹窗 ===== */
+        .modal-mask { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,.45); z-index: 1000; display: flex; align-items: center; justify-content: center; }
+        .modal { background: #fff; border-radius: 8px; width: 560px; max-height: 80vh; overflow-y: auto; }
+        .modal-header { padding: 16px 24px; border-bottom: 1px solid #ebeef5; display: flex; justify-content: space-between; align-items: center; }
+        .modal-header h3 { font-size: 16px; }
+        .modal-close { cursor: pointer; font-size: 20px; color: #909399; }
+        .modal-close:hover { color: #303133; }
+        .modal-body { padding: 24px; }
     </style>
 </head>
 <body>
-    <div id="app" class="layout">
-        <!-- 侧边栏 -->
-        <div class="sidebar">
-            <div class="sidebar-header">📋 表单管理</div>
-            <div class="sidebar-menu">
-                <div class="menu-item active" onclick="showPage('list')">
-                    <span>📝</span> 表单列表
-                </div>
-                <div class="menu-item" onclick="showPage('create')">
-                    <span>➕</span> 创建表单
-                </div>
-            </div>
+
+<!-- ============ 登录页 ============ -->
+<div id="loginPage" class="login-page">
+    <div class="login-card">
+        <h2>📋 表单管理系统</h2>
+        <p class="sub">X-From Form Management System</p>
+        <div id="loginError" class="login-error hidden"></div>
+        <div class="form-group">
+            <label>用户名</label>
+            <input type="text" id="loginUsername" class="form-input" placeholder="请输入用户名" value="admin">
         </div>
+        <div class="form-group">
+            <label>密码</label>
+            <input type="password" id="loginPassword" class="form-input" placeholder="请输入密码" value="admin123">
+        </div>
+        <button class="login-btn" id="loginBtn" onclick="handleLogin()">登 录</button>
+        <p class="login-tip">默认账号：admin / admin123</p>
+    </div>
+</div>
 
-        <!-- 主内容区 -->
-        <div class="main-content">
-            <div class="header">
-                <div class="header-title" id="pageTitle">表单列表</div>
-                <div>
-                    <span>👤 管理员</span>
-                </div>
+<!-- ============ 主界面 ============ -->
+<div id="mainApp" class="layout hidden">
+    <!-- 侧边栏 -->
+    <div class="sidebar">
+        <div class="sidebar-header">📋 表单管理</div>
+        <div class="sidebar-menu">
+            <div class="menu-item active" data-page="dashboard" onclick="switchPage('dashboard')">📊 工作台</div>
+            <div class="menu-item" data-page="forms" onclick="switchPage('forms')">📝 表单列表</div>
+            <div class="menu-item" data-page="create" onclick="switchPage('create')">➕ 创建表单</div>
+            <div class="menu-item" data-page="data" onclick="switchPage('data')">📊 数据查询</div>
+        </div>
+        <div class="sidebar-footer">
+            <div class="user-info">
+                <div class="avatar">👤</div>
+                <span id="sidebarUsername">管理员</span>
             </div>
-
-            <div class="content">
-                <!-- 表单列表页面 -->
-                <div id="listPage">
-                    <div class="card">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                            <h3>表单列表</h3>
-                            <button class="btn btn-primary" onclick="showPage('create')">
-                                ➕ 创建新表单
-                            </button>
-                        </div>
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>表单名称</th>
-                                    <th>表单编码</th>
-                                    <th>状态</th>
-                                    <th>创建人</th>
-                                    <th>创建时间</th>
-                                    <th>操作</th>
-                                </tr>
-                            </thead>
-                            <tbody id="formTableBody">
-                                <!-- 动态填充 -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- 创建表单页面 -->
-                <div id="createPage" class="hidden">
-                    <div class="card">
-                        <h3 style="margin-bottom: 20px;">创建新表单</h3>
-                        <div class="form-item">
-                            <label>表单名称 *</label>
-                            <input type="text" id="formName" placeholder="请输入表单名称">
-                        </div>
-                        <div class="form-item">
-                            <label>表单描述</label>
-                            <input type="text" id="formDesc" placeholder="请输入表单描述">
-                        </div>
-                        <div class="form-item">
-                            <label>表单配置（JSON）*</label>
-                            <textarea id="formConfig" placeholder='{
-  "fields": [
-    {
-      "key": "name",
-      "label": "姓名",
-      "type": "text",
-      "required": true,
-      "placeholder": "请输入您的姓名"
-    },
-    {
-      "key": "email",
-      "label": "邮箱",
-      "type": "email",
-      "required": true,
-      "placeholder": "请输入您的邮箱"
-    }
-  ]
-}'></textarea>
-                        </div>
-                        <div style="text-align: right;">
-                            <button class="btn btn-primary" onclick="createForm()">
-                                ✅ 创建表单
-                            </button>
-                            <button class="btn btn-info" onclick="showPage('list')">
-                                ❌ 取消
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 表单详情页面 -->
-                <div id="detailPage" class="hidden">
-                    <div class="card" id="formDetailCard">
-                        <!-- 动态填充 -->
-                    </div>
-                </div>
-            </div>
+            <span class="logout-btn" onclick="handleLogout()">退出登录</span>
         </div>
     </div>
 
-    <script>
-        const API_BASE = 'http://localhost:8091/api/form';
-        let currentFormId = null;
+    <!-- 主内容 -->
+    <div class="main">
+        <div class="header">
+            <div class="header-title" id="headerTitle">工作台</div>
+            <div></div>
+        </div>
+        <div class="content">
 
-        // 页面初始化
-        document.addEventListener('DOMContentLoaded', function() {
-            loadFormList();
+            <!-- ===== 工作台 ===== -->
+            <div id="page-dashboard">
+                <div class="stat-row">
+                    <div class="stat-card blue">
+                        <div class="stat-num" id="statFormCount">-</div>
+                        <div class="stat-label">表单总数</div>
+                    </div>
+                    <div class="stat-card green">
+                        <div class="stat-num" id="statEnabledCount">-</div>
+                        <div class="stat-label">启用中</div>
+                    </div>
+                    <div class="stat-card orange">
+                        <div class="stat-num" id="statSubmissionCount">-</div>
+                        <div class="stat-label">总提交数</div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">最近表单</span>
+                        <button class="btn btn-text" onclick="switchPage('forms')">查看全部 →</button>
+                    </div>
+                    <table class="table">
+                        <thead><tr><th>表单名称</th><th>编码</th><th>状态</th><th>创建时间</th></tr></thead>
+                        <tbody id="dashRecentForms"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ===== 表单列表 ===== -->
+            <div id="page-forms" class="hidden">
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">表单列表</span>
+                        <button class="btn btn-primary" onclick="switchPage('create')">➕ 创建表单</button>
+                    </div>
+                    <div id="formsEmpty" class="empty hidden"><div class="empty-icon">📭</div><div class="empty-text">暂无表单，点击上方按钮创建</div></div>
+                    <table class="table" id="formsTable">
+                        <thead><tr><th>ID</th><th>表单名称</th><th>编码</th><th>状态</th><th>创建人</th><th>创建时间</th><th>操作</th></tr></thead>
+                        <tbody id="formsTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ===== 创建表单（图形化设计器） ===== -->
+            <div id="page-create" class="hidden">
+                <div class="card">
+                    <div class="card-title" style="margin-bottom:20px">创建新表单</div>
+                    <div class="form-group">
+                        <label>表单名称 <span class="req">*</span></label>
+                        <input type="text" id="createFormName" class="form-input" placeholder="例如：用户信息登记表">
+                    </div>
+                    <div class="form-group">
+                        <label>表单描述</label>
+                        <input type="text" id="createFormDesc" class="form-input" placeholder="简要描述表单用途">
+                    </div>
+
+                    <!-- 字段设计器 -->
+                    <div style="margin-bottom:16px;display:flex;justify-content:space-between;align-items:center">
+                        <label style="font-weight:600;color:#303133;font-size:14px;margin:0">表单字段 <span style="color:#f56c6c">*</span></label>
+                        <button class="btn btn-primary" onclick="addField()">➕ 添加字段</button>
+                    </div>
+                    <div id="fieldList">
+                        <!-- 动态字段列表 -->
+                    </div>
+                    <div id="fieldEmpty" style="text-align:center;padding:32px 0;color:#c0c4cc">
+                        <div style="font-size:36px;margin-bottom:8px">📝</div>
+                        <div style="font-size:14px">点击「添加字段」开始设计表单</div>
+                    </div>
+                </div>
+                <div style="text-align:right">
+                    <button class="btn btn-primary" onclick="handleCreateForm()" style="padding:10px 32px;font-size:14px">✅ 创建表单</button>
+                    <button class="btn btn-info" onclick="switchPage('forms')" style="padding:10px 24px;font-size:14px">取消</button>
+                </div>
+            </div>
+
+            <!-- ===== 数据查询 ===== -->
+            <div id="page-data" class="hidden">
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">选择表单查看数据</span>
+                    </div>
+                    <div class="form-group" style="margin-bottom:0">
+                        <select id="dataFormSelect" class="form-input" onchange="handleLoadSubmissions()">
+                            <option value="">-- 请选择表单 --</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="card" id="dataResultCard" class="hidden">
+                    <div class="card-header">
+                        <span class="card-title" id="dataResultTitle">提交数据</span>
+                        <span style="font-size:13px;color:#909399" id="dataResultCount"></span>
+                    </div>
+                    <div id="dataEmpty" class="empty hidden"><div class="empty-icon">📭</div><div class="empty-text">暂无提交数据</div></div>
+                    <table class="table" id="dataTable">
+                        <thead><tr><th>ID</th><th>提交人</th><th>IP</th><th>提交时间</th><th>提交数据</th></tr></thead>
+                        <tbody id="dataTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- ============ 弹窗容器 ============ -->
+<div id="modalContainer"></div>
+
+<!-- ============ 提示容器 ============ -->
+<div id="toastContainer"></div>
+
+<script src="api.js"></script>
+<script>
+// ==================== 初始化 ====================
+
+document.addEventListener('DOMContentLoaded', function () {
+    if (FormApi.isLoggedIn()) {
+        showMainApp();
+    } else {
+        showLoginPage();
+    }
+    // 登录框回车
+    document.getElementById('loginPassword').addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') handleLogin();
+    });
+});
+
+// ==================== 登录 / 登出 ====================
+
+function showLoginPage() {
+    document.getElementById('loginPage').classList.remove('hidden');
+    document.getElementById('mainApp').classList.add('hidden');
+}
+
+function showMainApp() {
+    document.getElementById('loginPage').classList.add('hidden');
+    document.getElementById('mainApp').classList.remove('hidden');
+    var user = FormApi.getCurrentUser();
+    document.getElementById('sidebarUsername').textContent = user ? user.nickname : '用户';
+    switchPage('dashboard');
+}
+
+async function handleLogin() {
+    var btn = document.getElementById('loginBtn');
+    var username = document.getElementById('loginUsername').value.trim();
+    var password = document.getElementById('loginPassword').value.trim();
+    var errEl = document.getElementById('loginError');
+    if (!username || !password) {
+        errEl.textContent = '请输入用户名和密码';
+        errEl.classList.remove('hidden');
+        return;
+    }
+    btn.disabled = true;
+    btn.textContent = '登录中...';
+    try {
+        await FormApi.login(username, password);
+        showMainApp();
+        showToast('登录成功', 'success');
+    } catch (e) {
+        errEl.textContent = e.message;
+        errEl.classList.remove('hidden');
+    } finally {
+        btn.disabled = false;
+        btn.textContent = '登 录';
+    }
+}
+
+function handleLogout() {
+    FormApi.logout();
+    showLoginPage();
+    showToast('已退出登录', 'info');
+}
+
+// ==================== 页面切换 ====================
+
+function switchPage(page) {
+    var pages = ['dashboard', 'forms', 'create', 'data'];
+    var titles = { dashboard: '工作台', forms: '表单列表', create: '创建表单', data: '数据查询' };
+
+    pages.forEach(function (p) {
+        var el = document.getElementById('page-' + p);
+        if (el) el.classList.toggle('hidden', p !== page);
+    });
+
+    document.querySelectorAll('.menu-item').forEach(function (item) {
+        item.classList.toggle('active', item.getAttribute('data-page') === page);
+    });
+
+    document.getElementById('headerTitle').textContent = titles[page] || '';
+
+    // 按需加载数据
+    if (page === 'dashboard') loadDashboard();
+    if (page === 'forms') loadFormList();
+    if (page === 'data') loadFormSelect();
+}
+
+// ==================== 工作台 ====================
+
+async function loadDashboard() {
+    try {
+        var forms = await FormApi.getFormList();
+        var enabledCount = 0;
+        var totalSubmissions = 0;
+        forms.forEach(function (f) { if (statusCode(f.status) === 1) enabledCount++; });
+
+        document.getElementById('statFormCount').textContent = forms.length;
+        document.getElementById('statEnabledCount').textContent = enabledCount;
+
+        // 最近5条
+        var recent = forms.slice(0, 5);
+        var tbody = document.getElementById('dashRecentForms');
+        if (recent.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#c0c4cc">暂无数据</td></tr>';
+            document.getElementById('statSubmissionCount').textContent = '0';
+            return;
+        }
+        var html = '';
+        recent.forEach(function (f) {
+            html += '<tr><td>' + esc(f.formName) + '</td><td><code>' + esc(f.formCode) + '</code></td>'
+                + '<td><span class="tag ' + (statusCode(f.status) === 1 ? 'tag-success' : 'tag-danger') + '">' + statusInfo(f.status) + '</span></td>'
+                + '<td>' + esc(f.createTime) + '</td></tr>';
         });
+        tbody.innerHTML = html;
 
-        // 显示页面
-        function showPage(page) {
-            document.getElementById('listPage').classList.add('hidden');
-            document.getElementById('createPage').classList.add('hidden');
-            document.getElementById('detailPage').classList.add('hidden');
+        // 统计总提交数（取前5个表单的提交数累加）
+        var subPromises = recent.map(function (f) { return FormApi.getSubmissions(f.id).catch(function () { return []; }); });
+        var allSubs = await Promise.all(subPromises);
+        allSubs.forEach(function (subs) { totalSubmissions += subs.length; });
+        document.getElementById('statSubmissionCount').textContent = totalSubmissions;
 
-            document.querySelectorAll('.menu-item').forEach(item => {
-                item.classList.remove('active');
+    } catch (e) {
+        console.error('加载工作台失败', e);
+    }
+}
+
+// ==================== 表单列表 ====================
+
+async function loadFormList() {
+    try {
+        var forms = await FormApi.getFormList();
+        var tbody = document.getElementById('formsTableBody');
+        var emptyEl = document.getElementById('formsEmpty');
+        var tableEl = document.getElementById('formsTable');
+
+        if (forms.length === 0) {
+            emptyEl.classList.remove('hidden');
+            tableEl.classList.add('hidden');
+            return;
+        }
+        emptyEl.classList.add('hidden');
+        tableEl.classList.remove('hidden');
+
+        var html = '';
+        forms.forEach(function (f) {
+            html += '<tr>'
+                + '<td>' + f.id + '</td>'
+                + '<td>' + esc(f.formName) + '</td>'
+                + '<td><code style="font-size:12px">' + esc(f.formCode) + '</code></td>'
+                + '<td><span class="tag ' + (statusCode(f.status) === 1 ? 'tag-success' : 'tag-danger') + '">' + statusInfo(f.status) + '</span></td>'
+                + '<td>' + esc(f.creator) + '</td>'
+                + '<td>' + esc(f.createTime) + '</td>'
+                + '<td>'
+                + '<button class="btn btn-text" onclick="viewFormDetail(\'' + f.formCode + '\')">详情</button>'
+                + '<button class="btn btn-text" onclick="viewFormSubmissions(' + f.id + ',\'' + esc(f.formName) + '\')">数据</button>'
+                + '<button class="btn btn-text" onclick="copyFormLink(\'' + f.formCode + '\')">分享</button>'
+                + '</td></tr>';
+        });
+        tbody.innerHTML = html;
+    } catch (e) {
+        showToast('加载表单列表失败：' + e.message, 'error');
+    }
+}
+
+// ==================== 字段设计器 ====================
+
+var formFields = []; // { key, label, type, required, placeholder }
+var fieldIdSeq = 0;
+
+var FIELD_TYPES = [
+    { value: 'text',     label: '单行文本' },
+    { value: 'textarea', label: '多行文本' },
+    { value: 'number',   label: '数字' },
+    { value: 'email',    label: '邮箱' },
+    { value: 'tel',      label: '手机号' },
+    { value: 'select',   label: '下拉选择' },
+    { value: 'radio',    label: '单选' },
+    { value: 'checkbox', label: '多选' },
+    { value: 'date',     label: '日期' }
+];
+
+function addField() {
+    var id = ++fieldIdSeq;
+    formFields.push({ id: id, key: 'field_' + id, label: '', type: 'text', required: true, placeholder: '' });
+    renderFieldList();
+    // 滚动到新字段
+    var list = document.getElementById('fieldList');
+    var last = list.lastElementChild;
+    if (last) last.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function removeField(id) {
+    formFields = formFields.filter(function (f) { return f.id !== id; });
+    renderFieldList();
+}
+
+function moveField(id, dir) {
+    var idx = formFields.findIndex(function (f) { return f.id === id; });
+    if (idx < 0) return;
+    var newIdx = idx + dir;
+    if (newIdx < 0 || newIdx >= formFields.length) return;
+    var tmp = formFields[idx];
+    formFields[idx] = formFields[newIdx];
+    formFields[newIdx] = tmp;
+    renderFieldList();
+}
+
+function syncField(id) {
+    var f = formFields.find(function (f) { return f.id === id; });
+    if (!f) return;
+    f.key = document.getElementById('fk_' + id).value.trim();
+    f.label = document.getElementById('fl_' + id).value.trim();
+    f.type = document.getElementById('ft_' + id).value;
+    f.required = document.getElementById('fr_' + id).checked;
+    f.placeholder = document.getElementById('fp_' + id).value.trim();
+    // 更新头部标签
+    var headLabel = document.getElementById('fh_' + id);
+    if (headLabel) {
+        headLabel.textContent = f.label || '未命名字段';
+    }
+    var headType = document.getElementById('fht_' + id);
+    if (headType) {
+        var t = FIELD_TYPES.find(function (t) { return t.value === f.type; });
+        headType.textContent = t ? t.label : f.type;
+    }
+}
+
+function renderFieldList() {
+    var container = document.getElementById('fieldList');
+    var emptyEl = document.getElementById('fieldEmpty');
+
+    if (formFields.length === 0) {
+        container.innerHTML = '';
+        emptyEl.classList.remove('hidden');
+        return;
+    }
+    emptyEl.classList.add('hidden');
+
+    var html = '';
+    formFields.forEach(function (f, idx) {
+        var typeOptions = FIELD_TYPES.map(function (t) {
+            return '<option value="' + t.value + '"' + (f.type === t.value ? ' selected' : '') + '>' + t.label + '</option>';
+        }).join('');
+
+        var t = FIELD_TYPES.find(function (t) { return t.value === f.type; });
+
+        html += '<div class="field-card">'
+            + '<div class="field-card-head">'
+            + '<span class="field-label"><span id="fh_' + f.id + '">' + esc(f.label || '未命名字段') + '</span><span class="field-type-tag" id="fht_' + f.id + '">' + (t ? t.label : f.type) + '</span></span>'
+            + '<span class="field-actions">'
+            + '<button title="上移" onclick="moveField(' + f.id + ',-1)">↑</button>'
+            + '<button title="下移" onclick="moveField(' + f.id + ',1)">↓</button>'
+            + '<button class="del-btn" title="删除" onclick="removeField(' + f.id + ')">✕</button>'
+            + '</span></div>'
+            + '<div class="field-card-body">'
+            + '<div class="fg w2"><label>字段标识 (key)</label><input id="fk_' + f.id + '" value="' + esc(f.key) + '" placeholder="如 name" oninput="syncField(' + f.id + ')"></div>'
+            + '<div class="fg w2"><label>显示名称</label><input id="fl_' + f.id + '" value="' + esc(f.label) + '" placeholder="如 姓名" oninput="syncField(' + f.id + ')"></div>'
+            + '<div class="fg w1"><label>字段类型</label><select id="ft_' + f.id + '" onchange="syncField(' + f.id + ')">' + typeOptions + '</select></div>'
+            + '<div class="fg w1"><label>占位提示</label><input id="fp_' + f.id + '" value="' + esc(f.placeholder) + '" placeholder="如 请输入姓名" oninput="syncField(' + f.id + ')"></div>'
+            + '<div class="fg w1"><label>&nbsp;</label><div class="toggle"><input type="checkbox" id="fr_' + f.id + (f.required ? ' checked' : '') + ' onchange="syncField(' + f.id + ')"><span>必填</span></div></div>'
+            + '</div></div>';
+    });
+    container.innerHTML = html;
+}
+
+// ==================== 创建表单 ====================
+
+async function handleCreateForm() {
+    var name = document.getElementById('createFormName').value.trim();
+    var desc = document.getElementById('createFormDesc').value.trim();
+
+    if (!name) { showToast('请输入表单名称', 'error'); return; }
+    if (formFields.length === 0) { showToast('请至少添加一个表单字段', 'error'); return; }
+
+    // 同步最后编辑状态
+    formFields.forEach(function (f) { syncField(f.id); });
+
+    // 校验字段
+    for (var i = 0; i < formFields.length; i++) {
+        var f = formFields[i];
+        if (!f.key) { showToast('第 ' + (i + 1) + ' 个字段标识(key)不能为空', 'error'); return; }
+        if (!f.label) { showToast('第 ' + (i + 1) + ' 个字段显示名称不能为空', 'error'); return; }
+        // 检查 key 重复
+        for (var j = i + 1; j < formFields.length; j++) {
+            if (formFields[j].key === f.key) { showToast('字段标识 "' + f.key + '" 重复，请修改', 'error'); return; }
+        }
+    }
+
+    // 构建配置
+    var configObj = { fields: formFields.map(function (f) {
+        var field = { key: f.key, label: f.label, type: f.type, required: f.required, placeholder: f.placeholder || '' };
+        return field;
+    })};
+    var config = JSON.stringify(configObj);
+
+    try {
+        var user = FormApi.getCurrentUser();
+        var result = await FormApi.createForm({
+            formName: name,
+            formDesc: desc,
+            formConfig: config,
+            creator: user ? user.nickname : 'admin'
+        });
+        showToast('创建成功！编码：' + result.formCode, 'success');
+        // 清空
+        document.getElementById('createFormName').value = '';
+        document.getElementById('createFormDesc').value = '';
+        formFields = [];
+        fieldIdSeq = 0;
+        renderFieldList();
+        switchPage('forms');
+    } catch (e) {
+        showToast('创建失败：' + e.message, 'error');
+    }
+}
+
+// ==================== 表单详情（弹窗） ====================
+
+async function viewFormDetail(formCode) {
+    try {
+        var form = await FormApi.getForm(formCode);
+        var configHtml = '';
+        try {
+            configHtml = syntaxHighlight(JSON.stringify(JSON.parse(form.formConfig), null, 2));
+        } catch (e) {
+            configHtml = esc(form.formConfig);
+        }
+        var html = '<div class="modal-mask" onclick="closeModal(event)">'
+            + '<div class="modal" onclick="event.stopPropagation()">'
+            + '<div class="modal-header"><h3>' + esc(form.formName) + '</h3><span class="modal-close" onclick="closeModal()">✕</span></div>'
+            + '<div class="modal-body">'
+            + '<p style="margin-bottom:12px"><strong>编码：</strong><code>' + esc(form.formCode) + '</code></p>'
+            + '<p style="margin-bottom:12px"><strong>描述：</strong>' + (form.formDesc ? esc(form.formDesc) : '无') + '</p>'
+            + '<p style="margin-bottom:12px"><strong>状态：</strong><span class="tag ' + (statusCode(form.status) === 1 ? 'tag-success' : 'tag-danger') + '">' + statusInfo(form.status) + '</span></p>'
+            + '<p style="margin-bottom:12px"><strong>创建人：</strong>' + esc(form.creator) + '　<strong>时间：</strong>' + esc(form.createTime) + '</p>'
+            + '<p style="margin-bottom:8px"><strong>表单配置：</strong></p>'
+            + '<div class="json-box">' + configHtml + '</div>'
+            + '<div style="margin-top:16px">'
+            + '<button class="btn btn-success" onclick="copyFormLink(\'' + form.formCode + '\')">🔗 复制分享链接</button>'
+            + '<button class="btn btn-primary" onclick="closeModal();viewFormSubmissions(' + form.id + ',\'' + esc(form.formName) + '\')">📊 查看提交数据</button>'
+            + '</div></div></div></div>';
+        document.getElementById('modalContainer').innerHTML = html;
+    } catch (e) {
+        showToast('查询失败：' + e.message, 'error');
+    }
+}
+
+// ==================== 表单提交数据（弹窗） ====================
+
+async function viewFormSubmissions(formId, formName) {
+    try {
+        var subs = await FormApi.getSubmissions(formId);
+        var html = '<div class="modal-mask" onclick="closeModal(event)">'
+            + '<div class="modal" onclick="event.stopPropagation()">'
+            + '<div class="modal-header"><h3>' + esc(formName) + ' - 提交数据</h3><span class="modal-close" onclick="closeModal()">✕</span></div>'
+            + '<div class="modal-body">';
+
+        if (subs.length === 0) {
+            html += '<div class="empty"><div class="empty-icon">📭</div><div class="empty-text">暂无提交数据</div></div>';
+        } else {
+            html += '<p style="margin-bottom:12px;color:#909399">共 ' + subs.length + ' 条记录</p>';
+            subs.forEach(function (sub, i) {
+                var dataHtml = '';
+                try { dataHtml = syntaxHighlight(JSON.stringify(JSON.parse(sub.submissionData), null, 2)); }
+                catch (e) { dataHtml = esc(sub.submissionData); }
+                html += '<div style="border:1px solid #ebeef5;border-radius:6px;padding:12px;margin-bottom:12px">'
+                    + '<div style="display:flex;justify-content:space-between;margin-bottom:8px">'
+                    + '<span style="font-weight:600;color:#303133">#' + (i + 1) + '　' + esc(sub.submitter || '匿名') + '</span>'
+                    + '<span style="color:#909399;font-size:12px">' + esc(sub.createTime) + '</span></div>'
+                    + '<div class="json-box" style="max-height:150px">' + dataHtml + '</div></div>';
             });
-
-            if (page === 'list') {
-                document.getElementById('listPage').classList.remove('hidden');
-                document.querySelectorAll('.menu-item')[0].classList.add('active');
-                document.getElementById('pageTitle').textContent = '表单列表';
-                loadFormList();
-            } else if (page === 'create') {
-                document.getElementById('createPage').classList.remove('hidden');
-                document.querySelectorAll('.menu-item')[1].classList.add('active');
-                document.getElementById('pageTitle').textContent = '创建表单';
-            }
         }
+        html += '</div></div></div>';
+        document.getElementById('modalContainer').innerHTML = html;
+    } catch (e) {
+        showToast('查询数据失败：' + e.message, 'error');
+    }
+}
 
-        // 加载表单列表
-        async function loadFormList() {
+// ==================== 数据查询页面 ====================
+
+async function loadFormSelect() {
+    try {
+        var forms = await FormApi.getFormList();
+        var select = document.getElementById('dataFormSelect');
+        select.innerHTML = '<option value="">-- 请选择表单 --</option>';
+        forms.forEach(function (f) {
+            select.innerHTML += '<option value="' + f.id + '" data-name="' + esc(f.formName) + '">' + esc(f.formName) + '（' + f.formCode + '）</option>';
+        });
+        // 清空结果
+        document.getElementById('dataResultCard').classList.add('hidden');
+    } catch (e) {
+        showToast('加载表单列表失败', 'error');
+    }
+}
+
+async function handleLoadSubmissions() {
+    var select = document.getElementById('dataFormSelect');
+    var formId = select.value;
+    if (!formId) {
+        document.getElementById('dataResultCard').classList.add('hidden');
+        return;
+    }
+    var formName = select.options[select.selectedIndex].getAttribute('data-name');
+    try {
+        var subs = await FormApi.getSubmissions(formId);
+        document.getElementById('dataResultCard').classList.remove('hidden');
+        document.getElementById('dataResultTitle').textContent = formName + ' - 提交数据';
+        document.getElementById('dataResultCount').textContent = '共 ' + subs.length + ' 条';
+
+        var emptyEl = document.getElementById('dataEmpty');
+        var tableEl = document.getElementById('dataTable');
+        var tbody = document.getElementById('dataTableBody');
+
+        if (subs.length === 0) {
+            emptyEl.classList.remove('hidden');
+            tableEl.classList.add('hidden');
+            return;
+        }
+        emptyEl.classList.add('hidden');
+        tableEl.classList.remove('hidden');
+
+        var html = '';
+        subs.forEach(function (sub) {
+            var dataPreview = '';
             try {
-                const response = await fetch(`${API_BASE}/list`);
-                const result = await response.json();
-                
-                if (result.code === '0000') {
-                    const tbody = document.getElementById('formTableBody');
-                    tbody.innerHTML = '';
-                    
-                    result.data.forEach(form => {
-                        const tr = document.createElement('tr');
-                        tr.innerHTML = `
-                            <td>${form.id}</td>
-                            <td>${form.formName}</td>
-                            <td><code>${form.formCode}</code></td>
-                            <td>
-                                <span class="status-tag ${form.status.code === 1 ? 'status-enabled' : 'status-disabled'}">
-                                    ${form.status.info}
-                                </span>
-                            </td>
-                            <td>${form.creator}</td>
-                            <td>${form.createTime}</td>
-                            <td>
-                                <button class="btn btn-info" onclick="viewFormDetail('${form.formCode}')">查看</button>
-                                <button class="btn btn-success" onclick="copyFormLink('${form.formCode}')">分享链接</button>
-                            </td>
-                        `;
-                        tbody.appendChild(tr);
-                    });
-                } else {
-                    alert('加载表单列表失败：' + result.info);
-                }
-            } catch (error) {
-                console.error('加载表单列表失败', error);
-                alert('加载表单列表失败，请检查服务是否启动');
-            }
-        }
+                var obj = JSON.parse(sub.submissionData);
+                var keys = Object.keys(obj);
+                dataPreview = keys.slice(0, 3).map(function (k) { return k + ': ' + obj[k]; }).join('，');
+                if (keys.length > 3) dataPreview += '...';
+            } catch (e) { dataPreview = sub.submissionData.substring(0, 60); }
+            html += '<tr>'
+                + '<td>' + sub.id + '</td>'
+                + '<td>' + esc(sub.submitter || '匿名') + '</td>'
+                + '<td>' + esc(sub.submitterIp || '-') + '</td>'
+                + '<td>' + esc(sub.createTime) + '</td>'
+                + '<td><a href="javascript:void(0)" onclick="showSubmissionDetail(' + sub.id + ')" style="color:#409eff">' + esc(dataPreview) + '</a></td>'
+                + '</tr>';
+        });
+        tbody.innerHTML = html;
+    } catch (e) {
+        showToast('查询数据失败', 'error');
+    }
+}
 
-        // 创建表单
-        async function createForm() {
-            const formName = document.getElementById('formName').value;
-            const formDesc = document.getElementById('formDesc').value;
-            const formConfig = document.getElementById('formConfig').value;
+function showSubmissionDetail(subId) {
+    // 从当前表格数据中查找（简化实现，通过重新查询获取）
+    var select = document.getElementById('dataFormSelect');
+    var formId = select.value;
+    FormApi.getSubmissions(formId).then(function (subs) {
+        var sub = subs.find(function (s) { return s.id === subId; });
+        if (!sub) return;
+        var dataHtml = '';
+        try { dataHtml = syntaxHighlight(JSON.stringify(JSON.parse(sub.submissionData), null, 2)); }
+        catch (e) { dataHtml = esc(sub.submissionData); }
+        var html = '<div class="modal-mask" onclick="closeModal(event)">'
+            + '<div class="modal" onclick="event.stopPropagation()">'
+            + '<div class="modal-header"><h3>提交数据详情 #' + sub.id + '</h3><span class="modal-close" onclick="closeModal()">✕</span></div>'
+            + '<div class="modal-body">'
+            + '<p style="margin-bottom:8px;color:#909399">提交人：' + esc(sub.submitter || '匿名') + '　IP：' + esc(sub.submitterIp || '-') + '　时间：' + esc(sub.createTime) + '</p>'
+            + '<div class="json-box">' + dataHtml + '</div>'
+            + '</div></div></div>';
+        document.getElementById('modalContainer').innerHTML = html;
+    });
+}
 
-            if (!formName || !formConfig) {
-                alert('请填写必填字段');
-                return;
-            }
+// ==================== 工具函数 ====================
 
-            try {
-                const response = await fetch(`${API_BASE}/create`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        formName: formName,
-                        formDesc: formDesc,
-                        formConfig: formConfig,
-                        creator: 'admin'
-                    })
-                });
+/**
+ * 兼容 status 字段：后端可能返回对象 {code:1, info:"启用"} 或字符串 "ENABLED"/"DISABLED"
+ */
+function statusCode(s) {
+    if (!s) return 0;
+    if (typeof s === 'object') return s.code;
+    if (s === 'ENABLED') return 1;
+    return 0;
+}
+function statusInfo(s) {
+    if (!s) return '未知';
+    if (typeof s === 'object') return s.info;
+    if (s === 'ENABLED') return '启用';
+    if (s === 'DISABLED') return '禁用';
+    return s;
+}
 
-                const result = await response.json();
-                
-                if (result.code === '0000') {
-                    alert('表单创建成功！表单编码：' + result.data.formCode);
-                    showPage('list');
-                } else {
-                    alert('创建表单失败：' + result.info);
-                }
-            } catch (error) {
-                console.error('创建表单失败', error);
-                alert('创建表单失败，请检查服务是否启动');
-            }
-        }
+function esc(str) {
+    if (str === null || str === undefined) return '';
+    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
 
-        // 查看表单详情
-        async function viewFormDetail(formCode) {
-            try {
-                const response = await fetch(`${API_BASE}/get/${formCode}`);
-                const result = await response.json();
-                
-                if (result.code === '0000') {
-                    const form = result.data;
-                    currentFormId = form.id;
-                    
-                    document.getElementById('listPage').classList.add('hidden');
-                    document.getElementById('createPage').classList.add('hidden');
-                    document.getElementById('detailPage').classList.remove('hidden');
-                    document.getElementById('pageTitle').textContent = '表单详情';
-                    
-                    const detailCard = document.getElementById('formDetailCard');
-                    detailCard.innerHTML = `
-                        <h3 style="margin-bottom: 20px;">${form.formName}</h3>
-                        <p style="margin-bottom: 12px;"><strong>表单编码：</strong><code>${form.formCode}</code></p>
-                        <p style="margin-bottom: 12px;"><strong>表单描述：</strong>${form.formDesc || '无'}</p>
-                        <p style="margin-bottom: 12px;"><strong>状态：</strong>
-                            <span class="status-tag ${form.status.code === 1 ? 'status-enabled' : 'status-disabled'}">
-                                ${form.status.info}
-                            </span>
-                        </p>
-                        <p style="margin-bottom: 20px;"><strong>表单配置：</strong></p>
-                        <div class="json-preview">${form.formConfig}</div>
-                        
-                        <div style="margin-top: 20px; display: flex; gap: 12px;">
-                            <button class="btn btn-primary" onclick="copyFormLink('${form.formCode}')">
-                                🔗 复制分享链接
-                            </button>
-                            <button class="btn btn-info" onclick="loadSubmissions(${form.id})">
-                                📊 查看提交数据
-                            </button>
-                            <button class="btn btn-info" onclick="showPage('list')">
-                                ← 返回列表
-                            </button>
-                        </div>
-                        
-                        <div id="submissionsSection" style="margin-top: 24px;" class="hidden">
-                            <h4 style="margin-bottom: 16px;">提交记录</h4>
-                            <table class="table">
-                                <thead>
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>提交人</th>
-                                        <th>IP地址</th>
-                                        <th>提交时间</th>
-                                        <th>数据</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="submissionsTableBody">
-                                    <!-- 动态填充 -->
-                                </tbody>
-                            </table>
-                        </div>
-                    `;
-                } else {
-                    alert('查询表单失败：' + result.info);
-                }
-            } catch (error) {
-                console.error('查询表单失败', error);
-                alert('查询表单失败，请检查服务是否启动');
-            }
-        }
+function copyFormLink(formCode) {
+    // 智能生成分享链接：
+    // - Nginx 代理场景（端口 80/8080）：用相对路径 /user/form.html
+    // - 开发阶段（IDE 打开、文件协议等）：用用户端 HTML 的本地绝对路径
+    var port = window.location.port;
+    var link;
+    if (port === '80' || port === '8080' || port === '') {
+        // Nginx 代理场景
+        link = window.location.origin + '/user/form.html?code=' + formCode;
+    } else {
+        // 开发阶段：直接指向本地用户端 HTML 文件
+        // 从当前 admin/index.html 的路径推导 user/form.html 的路径
+        var currentPath = window.location.href;
+        // 把 admin/index.html 替换为 user/form.html
+        var basePath = currentPath.substring(0, currentPath.lastIndexOf('/'));
+        // admin 目录的上一级是 html 目录
+        var htmlDir = basePath.substring(0, basePath.lastIndexOf('/'));
+        link = htmlDir + '/user/form.html?code=' + formCode;
+    }
+    if (navigator.clipboard) {
+        navigator.clipboard.writeText(link).then(function () {
+            showToast('链接已复制：' + link, 'success');
+        });
+    } else {
+        showToast('分享链接：' + link, 'info');
+    }
+}
 
-        // 加载提交记录
-        async function loadSubmissions(formId) {
-            try {
-                const response = await fetch(`${API_BASE}/submissions/${formId}`);
-                const result = await response.json();
-                
-                if (result.code === '0000') {
-                    const section = document.getElementById('submissionsSection');
-                    section.classList.remove('hidden');
-                    
-                    const tbody = document.getElementById('submissionsTableBody');
-                    tbody.innerHTML = '';
-                    
-                    result.data.forEach(sub => {
-                        const tr = document.createElement('tr');
-                        tr.innerHTML = `
-                            <td>${sub.id}</td>
-                            <td>${sub.submitter || '匿名'}</td>
-                            <td>${sub.submitterIp || '-'}</td>
-                            <td>${sub.createTime}</td>
-                            <td>
-                                <details>
-                                    <summary>查看数据</summary>
-                                    <pre style="margin-top: 8px; padding: 8px; background: #f5f7fa; border-radius: 4px; font-size: 12px; overflow-x: auto;">${sub.submissionData}</pre>
-                                </details>
-                            </td>
-                        `;
-                        tbody.appendChild(tr);
-                    });
-                    
-                    if (result.data.length === 0) {
-                        tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #909399;">暂无提交数据</td></tr>';
-                    }
-                } else {
-                    alert('加载提交记录失败：' + result.info);
-                }
-            } catch (error) {
-                console.error('加载提交记录失败', error);
-                alert('加载提交记录失败，请检查服务是否启动');
-            }
-        }
+function closeModal(event) {
+    if (event && event.target !== event.currentTarget) return;
+    document.getElementById('modalContainer').innerHTML = '';
+}
 
-        // 复制分享链接
-        function copyFormLink(formCode) {
-            const link = `${window.location.origin}/user/form.html?code=${formCode}`;
-            navigator.clipboard.writeText(link).then(() => {
-                alert('链接已复制到剪贴板！\n' + link);
-            }).catch(() => {
-                alert('请手动复制链接：\n' + link);
-            });
-        }
-    </script>
+function showToast(msg, type) {
+    type = type || 'info';
+    var el = document.createElement('div');
+    el.className = 'toast toast-' + type;
+    el.textContent = msg;
+    document.getElementById('toastContainer').appendChild(el);
+    setTimeout(function () { el.remove(); }, 3000);
+}
+
+function syntaxHighlight(json) {
+    json = esc(json);
+    return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+        var cls = 'color:#e6a23c'; // number
+        if (/^"/.test(match)) {
+            if (/:$/.test(match)) { cls = 'color:#409eff'; } // key
+            else { cls = 'color:#67c23a'; } // string
+        } else if (/true|false/.test(match)) { cls = 'color:#f56c6c'; }
+        else if (/null/.test(match)) { cls = 'color:#909399'; }
+        return '<span style="' + cls + '">' + match + '</span>';
+    });
+}
+</script>
 </body>
 </html>

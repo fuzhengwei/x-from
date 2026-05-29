@@ -5,391 +5,190 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>表单填写</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 40px 20px;
-        }
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-        }
-        .card {
-            background: white;
-            border-radius: 12px;
-            padding: 40px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
-        }
-        .form-header {
-            text-align: center;
-            margin-bottom: 32px;
-        }
-        .form-header h1 {
-            font-size: 28px;
-            color: #303133;
-            margin-bottom: 8px;
-        }
-        .form-header p {
-            color: #909399;
-            font-size: 14px;
-        }
-        .form-item {
-            margin-bottom: 24px;
-        }
-        .form-item label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            color: #606266;
-            font-size: 14px;
-        }
-        .form-item label .required {
-            color: #f56c6c;
-            margin-left: 4px;
-        }
-        .form-item input[type="text"],
-        .form-item input[type="email"],
-        .form-item input[type="tel"],
-        .form-item input[type="number"],
-        .form-item textarea,
-        .form-item select {
-            width: 100%;
-            padding: 12px 16px;
-            border: 1px solid #dcdfe6;
-            border-radius: 8px;
-            font-size: 14px;
-            transition: all 0.3s;
-            font-family: inherit;
-        }
-        .form-item input:focus,
-        .form-item textarea:focus,
-        .form-item select:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-        .form-item textarea {
-            resize: vertical;
-            min-height: 100px;
-        }
-        .form-item input::placeholder,
-        .form-item textarea::placeholder {
-            color: #c0c4cc;
-        }
-        .btn {
-            width: 100%;
-            padding: 14px 24px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: 600;
-            transition: all 0.3s;
-        }
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
-        }
-        .btn-primary:active {
-            transform: translateY(0);
-        }
-        .btn-primary:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 2px solid rgba(255,255,255,0.3);
-            border-top-color: white;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-            margin-right: 8px;
-            vertical-align: middle;
-        }
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        .success-message {
-            text-align: center;
-            padding: 40px 20px;
-        }
-        .success-icon {
-            font-size: 64px;
-            margin-bottom: 20px;
-        }
-        .success-message h2 {
-            color: #67c23a;
-            margin-bottom: 12px;
-        }
-        .success-message p {
-            color: #909399;
-        }
-        .error-message {
-            text-align: center;
-            padding: 40px 20px;
-        }
-        .error-icon {
-            font-size: 64px;
-            margin-bottom: 20px;
-        }
-        .error-message h2 {
-            color: #f56c6c;
-            margin-bottom: 12px;
-        }
-        .error-message p {
-            color: #909399;
-        }
-        .form-not-found {
-            text-align: center;
-            padding: 60px 20px;
-        }
-        .form-not-found .icon {
-            font-size: 80px;
-            margin-bottom: 20px;
-        }
-        .form-not-found h2 {
-            color: #f56c6c;
-            margin-bottom: 12px;
-        }
-        .form-not-found p {
-            color: #909399;
-        }
-        .hidden {
-            display: none;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 40px 20px; }
+        .container { max-width: 600px; margin: 0 auto; }
+        .card { background: #fff; border-radius: 12px; padding: 40px; box-shadow: 0 20px 60px rgba(0,0,0,.15); }
+
+        /* 头部 */
+        .form-header { text-align: center; margin-bottom: 32px; }
+        .form-header h1 { font-size: 26px; color: #303133; margin-bottom: 8px; }
+        .form-header p { color: #909399; font-size: 14px; }
+
+        /* 表单项 */
+        .form-item { margin-bottom: 22px; }
+        .form-item label { display: block; margin-bottom: 8px; font-weight: 500; color: #606266; font-size: 14px; }
+        .form-item label .req { color: #f56c6c; margin-left: 2px; }
+        .form-input { width: 100%; padding: 12px 16px; border: 1px solid #dcdfe6; border-radius: 8px; font-size: 14px; transition: .3s; font-family: inherit; }
+        .form-input:focus { outline: none; border-color: #667eea; box-shadow: 0 0 0 3px rgba(102,126,234,.12); }
+        textarea.form-input { resize: vertical; min-height: 100px; }
+        .form-input::placeholder { color: #c0c4cc; }
+
+        /* 按钮 */
+        .btn { width: 100%; padding: 14px 24px; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: 600; transition: .3s; }
+        .btn-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(102,126,234,.3); }
+        .btn-primary:disabled { opacity: .6; cursor: not-allowed; transform: none; }
+
+        /* 加载 */
+        .spinner { display: inline-block; width: 20px; height: 20px; border: 2px solid rgba(255,255,255,.3); border-top-color: #fff; border-radius: 50%; animation: spin .8s linear infinite; margin-right: 8px; vertical-align: middle; }
+        .spinner-lg { width: 40px; height: 40px; border-width: 4px; border-color: rgba(102,126,234,.2); border-top-color: #667eea; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* 状态页 */
+        .state-page { text-align: center; padding: 40px 20px; }
+        .state-icon { font-size: 64px; margin-bottom: 16px; }
+        .state-page h2 { margin-bottom: 10px; }
+        .state-page p { color: #909399; }
+        .state-page .success-title { color: #67c23a; }
+        .state-page .error-title { color: #f56c6c; }
+
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="card" id="formCard">
-            <div id="loadingState" style="text-align: center; padding: 40px;">
-                <div class="loading" style="width: 40px; height: 40px; border-width: 4px;"></div>
-                <p style="margin-top: 16px; color: #909399;">加载中...</p>
+<div class="container">
+    <div class="card">
+        <!-- 加载中 -->
+        <div id="loadingState" class="state-page">
+            <div class="spinner spinner-lg" style="margin:0 auto 16px"></div>
+            <p style="color:#909399">加载中...</p>
+        </div>
+
+        <!-- 表单 -->
+        <div id="formState" class="hidden">
+            <div class="form-header">
+                <h1 id="formTitle"></h1>
+                <p id="formDesc"></p>
             </div>
-            
-            <div id="formState" class="hidden">
-                <div class="form-header">
-                    <h1 id="formTitle">表单标题</h1>
-                    <p id="formDesc">表单描述</p>
+            <form id="dynamicForm">
+                <div id="formFields"></div>
+                <div class="form-item">
+                    <button type="submit" class="btn btn-primary" id="submitBtn">✅ 提交</button>
                 </div>
-                <form id="dynamicForm">
-                    <div id="formFields">
-                        <!-- 动态生成表单字段 -->
-                    </div>
-                    <div class="form-item">
-                        <button type="submit" class="btn btn-primary" id="submitBtn">
-                            ✅ 提交
-                        </button>
-                    </div>
-                </form>
-            </div>
-            
-            <div id="successState" class="hidden">
-                <div class="success-message">
-                    <div class="success-icon">🎉</div>
-                    <h2>提交成功！</h2>
-                    <p>感谢您的填写，我们已收到您的信息。</p>
-                </div>
-            </div>
-            
-            <div id="errorState" class="hidden">
-                <div class="error-message">
-                    <div class="error-icon">❌</div>
-                    <h2>提交失败</h2>
-                    <p id="errorText">请稍后重试。</p>
-                </div>
-            </div>
-            
-            <div id="notFoundState" class="hidden">
-                <div class="form-not-found">
-                    <div class="icon">😔</div>
-                    <h2>表单不存在</h2>
-                    <p>请检查链接是否正确，或联系管理员。</p>
-                </div>
-            </div>
+            </form>
+        </div>
+
+        <!-- 成功 -->
+        <div id="successState" class="hidden state-page">
+            <div class="state-icon">🎉</div>
+            <h2 class="success-title">提交成功！</h2>
+            <p>感谢您的填写，我们已收到您的信息。</p>
+        </div>
+
+        <!-- 失败 -->
+        <div id="errorState" class="hidden state-page">
+            <div class="state-icon">❌</div>
+            <h2 class="error-title">提交失败</h2>
+            <p id="errorText">请稍后重试</p>
+            <button class="btn btn-primary" style="margin-top:20px;width:auto;padding:10px 32px" onclick="showState('form')">重新填写</button>
+        </div>
+
+        <!-- 不存在 -->
+        <div id="notFoundState" class="hidden state-page">
+            <div class="state-icon">😔</div>
+            <h2 class="error-title">表单不存在</h2>
+            <p>请检查链接是否正确，或联系管理员。</p>
         </div>
     </div>
+</div>
 
-    <script>
-        const API_BASE = 'http://localhost:8091/api/form';
-        let currentFormCode = null;
-        let currentFormConfig = null;
+<script src="api.js"></script>
+<script>
+var currentFormCode = null;
+var currentFormConfig = null;
 
-        // 获取URL参数
-        function getUrlParam(name) {
-            const urlParams = new URLSearchParams(window.location.search);
-            return urlParams.get(name);
+function getUrlParam(name) {
+    return new URLSearchParams(window.location.search).get(name);
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    currentFormCode = getUrlParam('code');
+    if (!currentFormCode) { showState('notFound'); return; }
+    loadForm();
+});
+
+function loadForm() {
+    UserFormApi.getForm(currentFormCode).then(function (form) {
+        if (form.status !== 'ENABLED' && !(typeof form.status === 'object' && form.status.code === 1)) { showState('notFound'); return; }
+        document.getElementById('formTitle').textContent = form.formName;
+        document.getElementById('formDesc').textContent = form.formDesc || '请填写以下信息';
+        try {
+            currentFormConfig = JSON.parse(form.formConfig);
+            renderFormFields();
+            showState('form');
+        } catch (e) {
+            showState('notFound');
         }
+    }).catch(function (e) {
+        showState('notFound');
+    });
+}
 
-        // 页面初始化
-        document.addEventListener('DOMContentLoaded', function() {
-            currentFormCode = getUrlParam('code');
-            
-            if (!currentFormCode) {
-                showState('notFound');
-                return;
-            }
-            
-            loadForm();
-        });
+function renderFormFields() {
+    var container = document.getElementById('formFields');
+    container.innerHTML = '';
+    if (!currentFormConfig || !currentFormConfig.fields) return;
 
-        // 加载表单
-        async function loadForm() {
-            try {
-                const response = await fetch(`${API_BASE}/get/${currentFormCode}`);
-                const result = await response.json();
-                
-                if (result.code === '0000') {
-                    const form = result.data;
-                    
-                    if (form.status.code !== 1) {
-                        showState('notFound');
-                        return;
-                    }
-                    
-                    document.getElementById('formTitle').textContent = form.formName;
-                    document.getElementById('formDesc').textContent = form.formDesc || '请填写以下信息';
-                    
-                    try {
-                        currentFormConfig = JSON.parse(form.formConfig);
-                        renderFormFields();
-                        showState('form');
-                    } catch (e) {
-                        console.error('表单配置解析失败', e);
-                        showState('notFound');
-                    }
-                } else {
-                    showState('notFound');
-                }
-            } catch (error) {
-                console.error('加载表单失败', error);
-                document.getElementById('errorText').textContent = '加载表单失败，请检查网络连接';
-                showState('error');
-            }
+    currentFormConfig.fields.forEach(function (field) {
+        var div = document.createElement('div');
+        div.className = 'form-item';
+        var label = '<label>' + field.label + (field.required ? '<span class="req">*</span>' : '') + '</label>';
+        var input = '';
+        var ph = field.placeholder || '';
+        var req = field.required ? ' required' : '';
+
+        switch (field.type) {
+            case 'textarea':
+                input = '<textarea name="' + field.key + '" class="form-input" placeholder="' + ph + '"' + req + '></textarea>';
+                break;
+            case 'select':
+                var opts = '<option value="">请选择</option>';
+                if (field.options) field.options.forEach(function (o) { opts += '<option value="' + o.value + '">' + o.label + '</option>'; });
+                input = '<select name="' + field.key + '" class="form-input"' + req + '>' + opts + '</select>';
+                break;
+            default:
+                input = '<input type="' + (field.type || 'text') + '" name="' + field.key + '" class="form-input" placeholder="' + ph + '"' + req + '>';
         }
+        div.innerHTML = label + input;
+        container.appendChild(div);
+    });
 
-        // 渲染表单字段
-        function renderFormFields() {
-            const container = document.getElementById('formFields');
-            container.innerHTML = '';
-            
-            if (!currentFormConfig || !currentFormConfig.fields) {
-                return;
-            }
-            
-            currentFormConfig.fields.forEach(field => {
-                const fieldDiv = document.createElement('div');
-                fieldDiv.className = 'form-item';
-                
-                let labelHtml = `<label>${field.label}${field.required ? '<span class="required">*</span>' : ''}</label>`;
-                let inputHtml = '';
-                
-                switch (field.type) {
-                    case 'textarea':
-                        inputHtml = `<textarea name="${field.key}" placeholder="${field.placeholder || ''}" ${field.required ? 'required' : ''}></textarea>`;
-                        break;
-                    case 'select':
-                        let optionsHtml = '<option value="">请选择</option>';
-                        if (field.options) {
-                            field.options.forEach(opt => {
-                                optionsHtml += `<option value="${opt.value}">${opt.label}</option>`;
-                            });
-                        }
-                        inputHtml = `<select name="${field.key}" ${field.required ? 'required' : ''}>${optionsHtml}</select>`;
-                        break;
-                    case 'email':
-                        inputHtml = `<input type="email" name="${field.key}" placeholder="${field.placeholder || ''}" ${field.required ? 'required' : ''}>`;
-                        break;
-                    case 'tel':
-                        inputHtml = `<input type="tel" name="${field.key}" placeholder="${field.placeholder || ''}" ${field.required ? 'required' : ''}>`;
-                        break;
-                    case 'number':
-                        inputHtml = `<input type="number" name="${field.key}" placeholder="${field.placeholder || ''}" ${field.required ? 'required' : ''}>`;
-                        break;
-                    default:
-                        inputHtml = `<input type="text" name="${field.key}" placeholder="${field.placeholder || ''}" ${field.required ? 'required' : ''}>`;
-                }
-                
-                fieldDiv.innerHTML = labelHtml + inputHtml;
-                container.appendChild(fieldDiv);
-            });
-            
-            // 添加提交监听
-            document.getElementById('dynamicForm').addEventListener('submit', handleSubmit);
-        }
+    document.getElementById('dynamicForm').addEventListener('submit', handleSubmit);
+}
 
-        // 处理表单提交
-        async function handleSubmit(e) {
-            e.preventDefault();
-            
-            const submitBtn = document.getElementById('submitBtn');
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<span class="loading"></span>提交中...';
-            
-            // 收集表单数据
-            const formData = {};
-            const formElements = document.getElementById('dynamicForm').elements;
-            
-            for (let element of formElements) {
-                if (element.name) {
-                    formData[element.name] = element.value;
-                }
-            }
-            
-            try {
-                const response = await fetch(`${API_BASE}/submit`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        formCode: currentFormCode,
-                        submissionData: JSON.stringify(formData),
-                        submitter: formData.name || formData.email || '匿名用户'
-                    })
-                });
+function handleSubmit(e) {
+    e.preventDefault();
+    var btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span>提交中...';
 
-                const result = await response.json();
-                
-                if (result.code === '0000') {
-                    showState('success');
-                } else {
-                    document.getElementById('errorText').textContent = result.info || '请稍后重试';
-                    showState('error');
-                }
-            } catch (error) {
-                console.error('提交表单失败', error);
-                document.getElementById('errorText').textContent = '提交失败，请检查网络连接';
-                showState('error');
-            } finally {
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = '✅ 提交';
-            }
-        }
+    var formData = {};
+    var els = document.getElementById('dynamicForm').elements;
+    for (var i = 0; i < els.length; i++) {
+        if (els[i].name) formData[els[i].name] = els[i].value;
+    }
 
-        // 显示状态
-        function showState(state) {
-            document.getElementById('loadingState').classList.add('hidden');
-            document.getElementById('formState').classList.add('hidden');
-            document.getElementById('successState').classList.add('hidden');
-            document.getElementById('errorState').classList.add('hidden');
-            document.getElementById('notFoundState').classList.add('hidden');
-            
-            document.getElementById(state + 'State').classList.remove('hidden');
-        }
-    </script>
+    UserFormApi.submitForm({
+        formCode: currentFormCode,
+        submissionData: JSON.stringify(formData),
+        submitter: formData.name || formData.email || '匿名用户'
+    }).then(function () {
+        showState('success');
+    }).catch(function (e) {
+        document.getElementById('errorText').textContent = e.message || '提交失败，请稍后重试';
+        showState('error');
+    }).finally(function () {
+        btn.disabled = false;
+        btn.innerHTML = '✅ 提交';
+    });
+}
+
+function showState(state) {
+    ['loading', 'form', 'success', 'error', 'notFound'].forEach(function (s) {
+        document.getElementById(s + 'State').classList.toggle('hidden', s !== state);
+    });
+}
+</script>
 </body>
 </html>
