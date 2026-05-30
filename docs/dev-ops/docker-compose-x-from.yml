@@ -12,6 +12,10 @@ services:
     environment:
       - TZ=Asia/Shanghai
       - SPRING_PROFILES_ACTIVE=dev
+      # Docker 容器内通过服务名访问 Ollama
+      - OLLAMA_BASE_URL=http://ollama:11434
+      # Docker 容器内通过服务名访问 MySQL
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/x_from?useUnicode=true&characterEncoding=utf8&autoReconnect=true&zeroDateTimeBehavior=convertToNull&serverTimezone=Asia/Shanghai&useSSL=false
     volumes:
       - ./logs:/data/log
     networks:
@@ -19,9 +23,10 @@ services:
     depends_on:
       - mysql
       - redis
+      - ollama
 
   x-from-nginx:
-    image: nginx:1.25.1-alpine
+    image: registry.cn-hangzhou.aliyuncs.com/xfg-studio/nginx:1.25.1-alpine
     container_name: x-from-nginx
     restart: always
     ports:
@@ -42,6 +47,7 @@ services:
     environment:
       TZ: Asia/Shanghai
       MYSQL_ROOT_PASSWORD: 123456
+      MYSQL_DATABASE: x_from
     ports:
       - "13306:3306"
     volumes:
@@ -75,6 +81,26 @@ services:
       timeout: 5s
       retries: 3
 
+  ollama:
+    image: registry.cn-hangzhou.aliyuncs.com/xfg-studio/ollama:0.5.10
+    container_name: x-from-ollama
+    restart: always
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    networks:
+      - x-from-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
 networks:
   x-from-network:
     driver: bridge
+
+volumes:
+  ollama_data:

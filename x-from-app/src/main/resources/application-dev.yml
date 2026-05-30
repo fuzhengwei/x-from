@@ -17,7 +17,7 @@ spring:
   datasource:
     username: root
     password: 123456
-    url: jdbc:mysql://140.143.183.225:13306/x_from?useUnicode=true&characterEncoding=utf8&autoReconnect=true&zeroDateTimeBehavior=convertToNull&serverTimezone=Asia/Shanghai&useSSL=false
+    url: jdbc:mysql://${SPRING_DATASOURCE_HOST:140.143.183.225}:${SPRING_DATASOURCE_PORT:13306}/${SPRING_DATASOURCE_DB:x_from}?useUnicode=true&characterEncoding=utf8&autoReconnect=true&zeroDateTimeBehavior=convertToNull&serverTimezone=Asia/Shanghai&useSSL=false
     driver-class-name: com.mysql.cj.jdbc.Driver
     type: com.zaxxer.hikari.HikariDataSource
     hikari:
@@ -36,8 +36,10 @@ mybatis:
   config-location:  classpath:/mybatis/config/mybatis-config.xml
 
 # Ollama 大模型配置
+# 本地开发直连：http://140.143.183.225:11434
+# Docker 容器内通过环境变量 OLLAMA_BASE_URL 覆盖，使用服务名：http://ollama:11434
 ollama:
-  base-url: http://140.143.183.225:11434
+  base-url: ${OLLAMA_BASE_URL:http://140.143.183.225:11434}
   model: qwen2.5:0.5b
 
 # 日志

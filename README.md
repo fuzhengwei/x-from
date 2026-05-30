@@ -116,21 +116,40 @@ cd x-from
 mvn clean package -Dmaven.test.skip=true
 ```
 
-#### 3. 一键启动（含 MySQL + Redis + 应用 + Nginx）
+#### 3. 一键启动（含 MySQL + Redis + Ollama + 应用 + Nginx）
 
 ```bash
 cd docs/dev-ops
 docker-compose -f docker-compose-x-from.yml up -d
 ```
 
-#### 4. 验证
+> ⚠️ Ollama 容器启动后需要拉取模型，首次约需 2-5 分钟（qwen2.5:0.5b 约 400MB）。
+
+#### 4. 拉取 Ollama 模型
+
+```bash
+# 等待 Ollama 容器就绪后，拉取 qwen2.5:0.5b 模型
+docker exec x-from-ollama ollama pull qwen2.5:0.5b
+```
+
+可通过以下命令确认模型是否拉取成功：
+
+```bash
+docker exec x-from-ollama ollama list
+# 应看到：qwen2.5:0.5b    xxx    397 MB
+```
+
+#### 5. 验证
 
 | 服务 | 地址 | 说明 |
 |------|------|------|
 | 管理端 | http://你的IP:8080/admin/ | 默认账号：admin / admin123 |
 | 用户端 | http://你的IP:8080/user/form.html?code=表单编码 | 填写表单 |
 | 智能客服 | http://你的IP:8080/user/chat.html | AI 在线客服 |
+| Ollama | http://你的IP:11434/ | 返回 "Ollama is running" |
 | 后端 API | http://你的IP:8091 | Spring Boot 服务 |
+
+> 💡 一键部署的 `docker-compose-x-from.yml` 已包含全部 5 个服务：MySQL、Redis、Ollama、x-from-app、Nginx，无需额外部署。
 
 ### 方式二：分步部署
 
@@ -177,19 +196,36 @@ java -jar x-from-app/target/x-from-app.jar --spring.profiles.active=dev
 
 #### 4. 部署 Ollama（智能客服依赖）
 
+Ollama 已包含在 `docker-compose-x-from.yml` 一键部署中。如需独立部署：
+
 ```bash
-# 拉取 Ollama 镜像
+# 拉取 Ollama 镜像（阿里云加速）
 docker pull registry.cn-hangzhou.aliyuncs.com/xfg-studio/ollama:0.5.10
 
-# 启动 Ollama
-docker run -d --name ollama -p 11434:11434 \
+# 启动 Ollama（持久化模型数据到 Docker Volume）
+docker run -d --name ollama \
+  -p 11434:11434 \
   -v ollama_data:/root/.ollama \
   --restart always \
   registry.cn-hangzhou.aliyuncs.com/xfg-studio/ollama:0.5.10
 
-# 拉取模型
+# 拉取 qwen2.5:0.5b 模型（约 400MB，需等待下载完成）
 docker exec ollama ollama pull qwen2.5:0.5b
+
+# 验证模型已就绪
+docker exec ollama ollama list
+
+# 验证 Ollama 服务正常
+curl http://localhost:11434/
+# 返回：Ollama is running
 ```
+
+> 💡 如果服务器配置较高（4G+内存），可更换更大的模型以获得更好的回答质量：
+> ```bash
+> docker exec ollama ollama pull qwen2.5:1.5b   # 约 1GB，质量更好
+> docker exec ollama ollama pull qwen2.5:7b      # 约 4.7GB，需要更大内存
+> ```
+> 同时修改 `application-dev.yml` 中的 `ollama.model` 配置。
 
 #### 5. 部署 Nginx
 
@@ -319,8 +355,10 @@ docker run -d --name x-from-nginx \
 
 ### Q: 智能客服无法回复？
 1. 确认 Ollama 容器已启动：`docker ps | grep ollama`
-2. 确认模型已拉取：`docker exec ollama ollama list`
-3. 测试 Ollama 是否正常：`curl http://你的IP:11434/`
+2. 确认模型已拉取：`docker exec x-from-ollama ollama list`（应看到 qwen2.5:0.5b）
+3. 如果没有模型，手动拉取：`docker exec x-from-ollama ollama pull qwen2.5:0.5b`
+4. 测试 Ollama 是否正常：`curl http://localhost:11434/`（应返回 "Ollama is running"）
+5. 如果 Docker 部署，检查 `OLLAMA_BASE_URL` 环境变量是否正确指向 `http://ollama:11434`
 
 ### Q: 端口冲突？
 修改 `docker-compose-x-from.yml` 中的端口映射。
