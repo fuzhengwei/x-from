@@ -2,6 +2,40 @@
 
 > 一个基于 DDD 六边形架构的在线表单管理系统，支持表单可视化设计、动态渲染、数据收集，并内置 AI 智能客服。
 
+## 🤖 本项目由 WaLiCode AI 辅助开发
+
+本项目全程使用 **[WaLiCode](https://walicode.xiaofuge.cn/)**（瓦力代码）进行开发，从需求分析、代码编写到服务器部署，WaLiCode 贯穿了整个开发生命周期。
+
+### WaLiCode 是什么？
+
+[WaLiCode](https://walicode.xiaofuge.cn/) 是一款 AI 驱动的智能编码助手，集成了 **AI Shell** 能力，可以：
+
+| 能力 | 说明 |
+|------|------|
+| 🧠 **需求理解与代码生成** | 自然语言描述需求，AI 自动生成符合 DDD 架构的代码 |
+| 🖥️ **AI Shell 远程操作** | 通过 SSH 连接云服务器，直接在终端执行部署命令（Docker、系统运维等） |
+| 📁 **文件上传部署** | 一键将本地文件/目录部署到远程服务器，自动执行 docker-compose 等启动命令 |
+| 🔧 **代码重构与修复** | 分析现有代码，智能建议重构方案并自动修改 |
+| 🚀 **全流程 DevOps** | 从本地编码 → 打包构建 → 上传服务器 → Docker 部署，一条龙完成 |
+
+### 本项目中 WaLiCode 的实际应用
+
+```
+用户："在云服务器的 Docker 里部署 Ollama"
+  ↓ WaLiCode 自动执行
+  SSH 连接服务器 → docker pull ollama → docker run → ollama pull model → curl 验证
+
+用户："开发智能客服功能，对接 Ollama 模型"
+  ↓ WaLiCode 自动生成
+  Domain 层（IChatService/IChatModelPort） → Infrastructure 层（OllamaGateway） → Trigger 层（ChatController）
+
+用户："部署项目到服务器"
+  ↓ WaLiCode 自动部署
+  mvn package → deploy_files 上传 → docker-compose up -d → 验证服务状态
+```
+
+> 💡 **想体验 AI 驱动开发？** 下载 [WaLiCode](https://walicode.xiaofuge.cn/)，用自然语言就能完成编码和部署！
+
 ## 📖 项目简介
 
 x-from 是一个完整的在线表单解决方案，提供从**表单创建 → 分享 → 填写 → 数据查询**的全流程能力，并集成基于 Ollama 大模型的智能客服，帮助用户快速上手平台。
@@ -375,6 +409,7 @@ ollama:
 
 ## 📚 参考资料
 
+- **WaLiCode AI 编码助手**：[https://walicode.xiaofuge.cn/](https://walicode.xiaofuge.cn/) — 本项目全程使用 WaLiCode 开发，支持 AI Shell 远程部署
 - Docker 使用文档：[https://bugstack.cn/md/road-map/docker.html](https://bugstack.cn/md/road-map/docker.html)
 - DDD 教程：
   - [DDD 概念理论](https://bugstack.cn/md/road-map/ddd-guide-01.html)
