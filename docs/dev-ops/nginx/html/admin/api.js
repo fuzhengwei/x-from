@@ -82,12 +82,38 @@ var FormApi = (function () {
 
     function getSubmissions(formId) { return request('/submissions/' + formId); }
 
+    // ========== 智能客服 ==========
+
+    var CHAT_API_BASE = (function () {
+        var port = window.location.port;
+        if (port === '80' || port === '8080' || port === '') {
+            return '/api/chat';
+        }
+        return 'http://140.143.183.225:8091/api/chat';
+    })();
+
+    function chatAsk(message, sessionId, history) {
+        var body = { message: message };
+        if (sessionId) body.sessionId = sessionId;
+        if (history && history.length > 0) body.history = history;
+        return fetch(CHAT_API_BASE + '/ask', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+        })
+        .then(function (res) { return res.json(); })
+        .then(function (result) {
+            if (result.code !== '0000') { throw new Error(result.info || '请求失败'); }
+            return result.data;
+        });
+    }
+
     // ========== 公开接口 ==========
 
     return {
         login: login, getCurrentUser: getCurrentUser, logout: logout, isLoggedIn: isLoggedIn,
         getFormList: getFormList, getForm: getForm, createForm: createForm,
-        submitForm: submitForm, getSubmissions: getSubmissions
+        submitForm: submitForm, getSubmissions: getSubmissions, chatAsk: chatAsk
     };
 
 })();

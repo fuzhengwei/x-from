@@ -165,6 +165,7 @@
             <div class="menu-item" data-page="forms" onclick="switchPage('forms')">📝 表单列表</div>
             <div class="menu-item" data-page="create" onclick="switchPage('create')">➕ 创建表单</div>
             <div class="menu-item" data-page="data" onclick="switchPage('data')">📊 数据查询</div>
+            <div class="menu-item" data-page="chat" onclick="switchPage('chat')">🤖 智能客服</div>
         </div>
         <div class="sidebar-footer">
             <div class="user-info">
@@ -283,6 +284,37 @@
                 </div>
             </div>
 
+            <!-- ===== 智能客服 ===== -->
+            <div id="page-chat" class="hidden">
+                <div class="card" style="height:calc(100vh - 140px);display:flex;flex-direction:column;padding:0;overflow:hidden">
+                    <div style="padding:16px 24px;border-bottom:1px solid #ebeef5;display:flex;align-items:center;gap:10px;flex-shrink:0">
+                        <span style="font-size:24px">🤖</span>
+                        <div>
+                            <div style="font-weight:600;font-size:15px;color:#303133">小 X 智能客服</div>
+                            <div style="font-size:12px;color:#909399">x-from 平台使用助手，为您解答任何问题</div>
+                        </div>
+                    </div>
+                    <div id="adminChatMessages" style="flex:1;overflow-y:auto;padding:20px;background:#f5f7fa">
+                        <div style="display:flex;gap:10px;margin-bottom:16px">
+                            <div style="width:36px;height:36px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;box-shadow:0 1px 4px rgba(0,0,0,.08)">🤖</div>
+                            <div style="max-width:70%">
+                                <div style="background:#fff;padding:12px 16px;border-radius:14px 14px 14px 4px;font-size:14px;line-height:1.7;box-shadow:0 1px 4px rgba(0,0,0,.04)">你好！我是 x-from 平台的智能客服「小 X」🤖，很高兴为您服务！<br><br>我可以帮您解答关于表单创建、字段设计、数据查询等任何平台使用问题。请问有什么可以帮您的？</div>
+                                <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px">
+                                    <button onclick="adminChatSend('如何创建表单？')" style="padding:5px 14px;border:1px solid #e8eaec;border-radius:16px;background:#fff;color:#606266;font-size:12px;cursor:pointer">如何创建表单？</button>
+                                    <button onclick="adminChatSend('支持哪些字段类型？')" style="padding:5px 14px;border:1px solid #e8eaec;border-radius:16px;background:#fff;color:#606266;font-size:12px;cursor:pointer">支持哪些字段类型？</button>
+                                    <button onclick="adminChatSend('如何分享表单给用户填写？')" style="padding:5px 14px;border:1px solid #e8eaec;border-radius:16px;background:#fff;color:#606266;font-size:12px;cursor:pointer">如何分享表单？</button>
+                                    <button onclick="adminChatSend('怎么查看用户提交的数据？')" style="padding:5px 14px;border:1px solid #e8eaec;border-radius:16px;background:#fff;color:#606266;font-size:12px;cursor:pointer">查看提交数据</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:10px;padding:12px 16px;background:#fff;border-top:1px solid #ebeef5;flex-shrink:0">
+                        <input type="text" id="adminChatInput" placeholder="输入您的问题..." maxlength="500" style="flex:1;padding:10px 16px;border:1px solid #e8eaec;border-radius:20px;font-size:14px;outline:none" onkeydown="if(event.key==='Enter')adminChatSend()">
+                        <button id="adminChatSendBtn" onclick="adminChatSend()" style="width:40px;height:40px;border-radius:50%;border:none;background:#409eff;color:#fff;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center">➤</button>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 </div>
@@ -358,8 +390,8 @@ function handleLogout() {
 // ==================== 页面切换 ====================
 
 function switchPage(page) {
-    var pages = ['dashboard', 'forms', 'create', 'data'];
-    var titles = { dashboard: '工作台', forms: '表单列表', create: '创建表单', data: '数据查询' };
+    var pages = ['dashboard', 'forms', 'create', 'data', 'chat'];
+    var titles = { dashboard: '工作台', forms: '表单列表', create: '创建表单', data: '数据查询', chat: '智能客服' };
 
     pages.forEach(function (p) {
         var el = document.getElementById('page-' + p);
@@ -835,6 +867,74 @@ function syntaxHighlight(json) {
         return '<span style="' + cls + '">' + match + '</span>';
     });
 }
+
+// ==================== 管理端智能客服 ====================
+
+var adminChatSessionId = null;
+var adminChatHistory = [];
+var adminChatSending = false;
+
+function adminChatSend(quickText) {
+    if (adminChatSending) return;
+    var input = document.getElementById('adminChatInput');
+    var text = quickText || input.value.trim();
+    if (!text) return;
+
+    var container = document.getElementById('adminChatMessages');
+
+    // 用户消息
+    var userRow = document.createElement('div');
+    userRow.style.cssText = 'display:flex;gap:10px;margin-bottom:16px;justify-content:flex-end';
+    userRow.innerHTML = '<div style="max-width:70%"><div style="background:#409eff;color:#fff;padding:12px 16px;border-radius:14px 14px 4px 14px;font-size:14px;line-height:1.7;white-space:pre-wrap">' + esc(text) + '</div></div>'
+        + '<div style="width:36px;height:36px;border-radius:50%;background:#409eff;display:flex;align-items:center;justify-content:center;font-size:14px;color:#fff;flex-shrink:0">👤</div>';
+    container.appendChild(userRow);
+
+    adminChatHistory.push({ role: 'user', content: text });
+    input.value = '';
+
+    // 打字指示
+    var typingRow = document.createElement('div');
+    typingRow.id = 'adminChatTyping';
+    typingRow.style.cssText = 'display:flex;gap:10px;margin-bottom:16px';
+    typingRow.innerHTML = '<div style="width:36px;height:36px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;box-shadow:0 1px 4px rgba(0,0,0,.08)">🤖</div>'
+        + '<div style="background:#fff;padding:12px 16px;border-radius:14px 14px 14px 4px;display:inline-flex;gap:4px;align-items:center"><span style="width:8px;height:8px;border-radius:50%;background:#c0c4cc;animation:adminBounce 1.4s infinite ease-in-out"></span><span style="width:8px;height:8px;border-radius:50%;background:#c0c4cc;animation:adminBounce 1.4s infinite ease-in-out .2s"></span><span style="width:8px;height:8px;border-radius:50%;background:#c0c4cc;animation:adminBounce 1.4s infinite ease-in-out .4s"></span></div>';
+    container.appendChild(typingRow);
+    container.scrollTop = container.scrollHeight;
+
+    adminChatSending = true;
+    document.getElementById('adminChatSendBtn').disabled = true;
+
+    FormApi.chatAsk(text, adminChatSessionId, adminChatHistory.slice(0, -1)).then(function (data) {
+        var typing = document.getElementById('adminChatTyping');
+        if (typing) typing.remove();
+
+        adminChatSessionId = data.sessionId;
+        adminChatHistory.push({ role: 'assistant', content: data.reply });
+
+        var botRow = document.createElement('div');
+        botRow.style.cssText = 'display:flex;gap:10px;margin-bottom:16px';
+        botRow.innerHTML = '<div style="width:36px;height:36px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;box-shadow:0 1px 4px rgba(0,0,0,.08)">🤖</div>'
+            + '<div style="max-width:70%"><div style="background:#fff;padding:12px 16px;border-radius:14px 14px 14px 4px;font-size:14px;line-height:1.7;white-space:pre-wrap;box-shadow:0 1px 4px rgba(0,0,0,.04)">' + esc(data.reply) + '</div></div>';
+        container.appendChild(botRow);
+        container.scrollTop = container.scrollHeight;
+    }).catch(function (e) {
+        var typing = document.getElementById('adminChatTyping');
+        if (typing) typing.remove();
+
+        var errRow = document.createElement('div');
+        errRow.style.cssText = 'display:flex;gap:10px;margin-bottom:16px';
+        errRow.innerHTML = '<div style="width:36px;height:36px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;box-shadow:0 1px 4px rgba(0,0,0,.08)">🤖</div>'
+            + '<div style="background:#fff;padding:12px 16px;border-radius:14px 14px 14px 4px;font-size:14px;color:#f56c6c">抱歉，暂时无法回复，请稍后再试 😥</div>';
+        container.appendChild(errRow);
+        container.scrollTop = container.scrollHeight;
+    }).finally(function () {
+        adminChatSending = false;
+        document.getElementById('adminChatSendBtn').disabled = false;
+    });
+}
 </script>
+<style>
+@keyframes adminBounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
+</style>
 </body>
 </html>

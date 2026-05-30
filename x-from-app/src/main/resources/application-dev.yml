@@ -35,8 +35,14 @@ mybatis:
   mapper-locations: classpath:/mybatis/mapper/*.xml
   config-location:  classpath:/mybatis/config/mybatis-config.xml
 
+# Ollama 大模型配置
+ollama:
+  base-url: http://140.143.183.225:11434
+  model: qwen2.5:0.5b
+
 # 日志
 logging:
   level:
     root: info
+    cn.xiaofuge: debug
   config: classpath:logback-spring.xml
